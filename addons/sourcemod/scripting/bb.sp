@@ -33,11 +33,11 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public void OnPluginStart()
 {
-	BB_IsGameCSGO();
+    BB_IsGameCSGO();
 
     g_iCollisionOffset = FindSendPropInfo("CBaseEntity", "m_CollisionGroup");
 
-	BB_StartConfig("bb");
+    BB_StartConfig("bb");
     SetupConfig();
-	BB_EndConfig();
+    BB_EndConfig();
 }
