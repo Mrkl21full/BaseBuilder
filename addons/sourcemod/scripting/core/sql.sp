@@ -6,7 +6,6 @@ public void SQL_OnClientPutInServer(Database db, DBResultSet results, const char
     {
         return;
     }
-        
 
     if (db == null || strlen(error) > 0)
     {
@@ -14,5 +13,18 @@ public void SQL_OnClientPutInServer(Database db, DBResultSet results, const char
         return;
     }
 
-    // TODO: Set level / insert player to db.
+    if (results.RowCount > 0 && results.FetchRow())
+    {
+        g_iPlayer[client].iColor = results.FetchInt(0);
+        g_iPlayer[client].iPoints = results.FetchInt(1);
+        g_iPlayer[client].iLevel = results.FetchInt(2);
+    }
+    else
+    {
+        g_iPlayer[client].iColor = GetRandomInt(0, sizeof(g_iColorRed) - 1);
+        g_iPlayer[client].iPoints = 0;
+        g_iPlayer[client].iLevel = 1;
+
+        UpdatePlayer(client);
+    }
 }

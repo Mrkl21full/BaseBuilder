@@ -1,0 +1,66 @@
+"Phrases"
+{
+	"Main: Suicide disabled"
+	{
+		"en"		"Suicides are disabled!"
+		"pl"		"Samobójstwa są wyłączone!"
+	}
+
+	"Main: Team change disabled"
+	{
+		"en"		"Team changes are disabled! Press ESC!"
+		"pl"		"Zmiana drużyn jest wyłączona! Kliknij ESC!"
+	}
+
+	"Main: Current points"
+	{
+		"#format"	"{1:d}"
+		"en"		"You have {green}{1} points{default}!"
+		"pl"		"Aktualnie masz {green}{1} punktów{default}!"
+	}
+
+	"Main: Current level"
+	{
+		"#format"	"{1:d}"
+		"en"		"Your current level is {green}{1}{default}!"
+		"pl"		"Twój aktualny level to {green}{1}{default}!"
+	}
+
+	"Main: Next level in"
+	{
+		"#format"	"{1:d}"
+		"en"		"Next level in {green}{1} points{default}!"
+		"pl"		"Następny level za {green}{1} punktów{default}!"
+	}
+
+	"Main: Flashlight enabled"
+	{
+		"en"		"Flashlight has been {green}enabled{default}!"
+		"pl"		"Latarka została {green}włączona{default}!"
+	}
+
+	"Main: Flashlight disabled"
+	{
+		"en"		"Flashlight has been {green}disabled{default}!"
+		"pl"		"Latarka została {green}wyłączona{default}!"
+	}
+	
+	"Main: Cannot use in active round"
+	{
+		"en"		"You can't do it during active round!"
+		"pl"		"Nie możesz tego zrobić podczas aktywnej rundy!"
+	}
+
+	"Main: Command limited usage"
+	{
+		"#format"	"{1:d}"
+		"en"		"You can use this command only {green}{1} times{default} per round!"
+		"pl"		"Możesz użyć tej komendy tylko {green}{1} razy{default} na rundę!"
+	}
+
+	"Party: Team member left"
+	{
+		"en"		"You team member left the server!"
+		"pl"		"Twój kolega z party wyszedł z serwera!"
+	}
+}

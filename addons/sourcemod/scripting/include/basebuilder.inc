@@ -6,7 +6,7 @@
 #define LoopValidClients(%1) for(int %1 = 1; %1 <= MaxClients; %1++) if(BB_IsClientValid(%1))
 
 #define BB_PLUGIN_NAME "BaseBuilder"
-#define BB_PLUGIN_AUTHOR "Mrkl21full & K4M1s"
+#define BB_PLUGIN_AUTHOR "BaseBuilder Contributors"
 #define BB_PLUGIN_DESCRIPTION "BaseBuidler from CS 1.6"
 #define BB_PLUGIN_VERSION "1.0"
 #define BB_PLUGIN_URL "https://steamcommunity.com/id/MrKrystianKl/"
@@ -85,11 +85,6 @@ native bool BB_IsBuildTime();
 native bool BB_IsPrepTime();
 
 /**
- * Get current round startus (see RoundStatus enum for available status).
- */
-native RoundStatus BB_GetRoundStatus();
-
-/**
  * Force player to play in the zombies team.
  */
 native bool BB_ForceZombie(int client);
@@ -150,6 +145,11 @@ native int BB_GetClientLevel(int client);
 native int BB_GetClientPoints(int client);
 
 /**
+ * Get current round startus (see RoundStatus enum for available status).
+ */
+native RoundStatus BB_GetRoundStatus();
+
+/**
  * Check if client index is valid.
  *
  * @param client            Client index.
@@ -172,6 +172,14 @@ stock bool BB_IsClientValid(int client)
     }
 
     return false;
+}
+
+/**
+ * Load BaseBuilder translation file.
+ */
+stock bool BB_LoadTranslations()
+{
+    LoadTranslations("basebuilder.phrases");
 }
 
 /**

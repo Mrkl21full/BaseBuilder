@@ -59,8 +59,8 @@ int g_iColorBlue[17] = { 128, 53, 98, 175, 182, 180, 242, 243, 211, 135, 79, 73,
 // TODO: Make then in english?
 char g_sColorName[][] = { "Domyślny", "Jasny czerwony", "Różowy", "Fioletowy", "Ciemny fioletowy", "Fioletowo-Niebieski", "Niebieski", "Jasny niebieski", "Morski", "Niebiesko-Zielony", "Jasny zielony", "Limonkowy", "Żółty", "Żółto-Pomarańczowy", "Pomarańczowy", "Ciemny pomarańczowy", "Brazowy" };
 
-float g_fSpawnLocation[32][3];
-float g_fSpawnAngles[32][3];
+float g_fSpawnLocation[64][3];
+float g_fSpawnAngles[64][3];
 
 int g_iRoundID = -1;
 
@@ -84,6 +84,31 @@ enum struct PlayerData
 {
     int iPoints;
     int iLevel;
+
+    int iPlayerSelectedBlock;
+    int iPlayerPrevButtons;
+    int iPlayerNewEntity;
+    int iInPartyWith;
+    int iRespawn;
+    int iLocks;
+    int iColor;
+    int iIcon;
+
+    float fSpeed;
+    float fGravity;
+    float fPlayerSelectedBlockDistance;
+
+    bool bIsOnIce;
+    bool bIsInParty;
+    bool bFlashlight;
+    bool bPartyOwner;
+    bool bOnceStopped;
+    bool bTouchingBlock;
+    bool bTakenWithNoOwner;
+    bool bWasAlreadyInServer;
+    bool bWasBuilderThisRound;
+
+    Handle hInvite;
 }
 
 PlayerData g_iPlayer[MAXPLAYERS + 1];
