@@ -3,7 +3,7 @@ BaseBuilder from Counter Strike 1.6 ported to Counter Strike: Global Offensive.
 
 | Action Status |
 |:-------------:|
-| [![Action Status](https://github.com/Mrkl21full/BaseBuilder/workflows/Compile%20with%20SourceMod/badge.svg)](https://github.com/Bara/TroubleinTerroristTown/actions) |
+| [![Action Status](https://github.com/Mrkl21full/BaseBuilder/workflows/Compile%20with%20SourceMod/badge.svg)](https://github.com/Mrkl21full/BaseBuilder/actions) |
 
 Current developers
 ---
