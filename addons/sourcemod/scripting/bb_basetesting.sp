@@ -99,12 +99,14 @@ public Action Command_BaseTesting(int client, int args)
     if (!BB_IsClientValid(client))
 		return Plugin_Handled;
 
-    if (GetClientTeam(client) != TEAM_ZOMBIES) {
+    if (GetClientTeam(client) != TEAM_ZOMBIES)
+    {
         CPrintToChat(client, "Only zombies can use this command!");
         return Plugin_Handled;
     }
 
-    if (BB_GetRoundStatus() != Round_Building) {
+    if (BB_GetRoundStatus() != Round_Building)
+    {
         CPrintToChat(client, "This command can be used only while building phase!");
         return Plugin_Handled;
     }
@@ -115,8 +117,10 @@ public Action Command_BaseTesting(int client, int args)
 
 public void BB_OnPrepStart() 
 {
-    LoopValidClients(i) {
-        if (g_iPlayer[i].bIsTesting) {
+    LoopValidClients(i)
+    {
+        if (g_iPlayer[i].bIsTesting)
+        {
             g_iPlayer[i].bIsTesting = false;
             BB_TeleportToZombies(i);
         }
@@ -129,8 +133,10 @@ public void BB_OnRoundEnd(int winner)
 {
     BB_ClearTimer(g_hTimer);
 
-    LoopValidClients(i){
-        LoopValidClients(j) {
+    LoopValidClients(i)
+    {
+        LoopValidClients(j)
+        {
             g_iPlayer[i].iDistance[j] = 10000;
         }
     }
@@ -139,10 +145,12 @@ public void BB_OnRoundEnd(int winner)
 public Action Timer_CheckPlayersDistances(Handle timer)
 {
     float fPlayer[3], fTarget[3];
-    LoopValidClients(i) {
+    LoopValidClients(i)
+    {
         GetEntPropVector(i, Prop_Data, "m_vecOrigin", fPlayer);
 
-        LoopValidClients(j) {
+        LoopValidClients(j)
+        {
             GetEntPropVector(j, Prop_Data, "m_vecOrigin", fTarget);
             g_iPlayer[i].iDistance[j] = RoundToZero(GetVectorDistance(fPlayer, fTarget, true));
         }
