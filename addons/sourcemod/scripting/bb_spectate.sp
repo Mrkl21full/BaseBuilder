@@ -52,7 +52,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 
 public int Native_IsZombieSpectating(Handle plugin, int numParams)
 {
-	return g_iPlayer[GetNativeCell(1)].bIsSpectating;
+    return g_iPlayer[GetNativeCell(1)].bIsSpectating;
 }
 
 public int Native_SetZombieSpectating(Handle plugin, int numParams)
@@ -90,7 +90,7 @@ public void OnPluginStart()
     g_cPartyTeammateHideDistance = AutoExecConfig_CreateConVar("bb_party_teammate_hide_distance", "9000", "Sets a distance wherein party teammates are not visible for each others.", _, true, 5000.0);
     g_cHideZombieWhileSpectating = AutoExecConfig_CreateConVar("bb_hide_spectating_zombie", "1", "Turn on/off hiding zombies which are spectating.", _, true, 0.0, true, 1.0);
     BB_EndConfig();
-    
+
     RegConsoleCmd("sm_spectate", Command_ZombieSpectate);
 
     LoopValidClients(i)
@@ -132,7 +132,8 @@ public void OnConfigsExecuted()
 
 public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-    if(convar == g_cPluginTag){
+    if (convar == g_cPluginTag)
+    {
         g_cPluginTag.GetString(g_sPluginTag, sizeof(g_sPluginTag));
     }
 }
