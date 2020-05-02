@@ -3,8 +3,6 @@
 
 #include <sourcemod>
 #include <sdkhooks>
-#include <multicolors>
-#include <emitsoundany>
 #include <basebuilder>
 #include <basebuilder_spectate>
 #include <basebuilder_playerhud>
@@ -86,11 +84,11 @@ public void OnPluginStart()
 
     BB_StartConfig("spectate");
     CreateConVar("bb_spectate_version", BB_PLUGIN_VERSION, BB_PLUGIN_DESCRIPTION, FCVAR_NOTIFY | FCVAR_DONTRECORD | FCVAR_REPLICATED);
-    g_cHideZombiesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_zombie_while_close_to_each_others", "1", "Turn on/off hiding zombies whose is close to each others.");
-    g_cZombieHideDistance = AutoExecConfig_CreateConVar("bb_zombie_hide_distance", "9000", "Sets a distance wherein zombies are not visible for each others.");
-    g_cHidePartyTeammatesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_party_teammates_while_close_to_each_others", "1", "Turn on/off hiding party teammates whose is close to each others.");
-    g_cPartyTeammateHideDistance = AutoExecConfig_CreateConVar("bb_party_teammate_hide_distance", "9000", "Sets a distance wherein party teammates are not visible for each others.");
-    g_cHideZombieWhileSpectating = AutoExecConfig_CreateConVar("bb_hide_spectating_zombie", "1", "Turn on/off hiding zombies which are spectating.");
+    g_cHideZombiesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_zombie_while_close_to_each_others", "1", "Turn on/off hiding zombies whose is close to each others.", _, true, 0.0, true, 1.0);
+    g_cZombieHideDistance = AutoExecConfig_CreateConVar("bb_zombie_hide_distance", "9000", "Sets a distance wherein zombies are not visible for each others.", _, true, 5000.0);
+    g_cHidePartyTeammatesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_party_teammates_while_close_to_each_others", "1", "Turn on/off hiding party teammates whose is close to each others.", _, true, 0.0, true, 1.0);
+    g_cPartyTeammateHideDistance = AutoExecConfig_CreateConVar("bb_party_teammate_hide_distance", "9000", "Sets a distance wherein party teammates are not visible for each others.", _, true, 5000.0);
+    g_cHideZombieWhileSpectating = AutoExecConfig_CreateConVar("bb_hide_spectating_zombie", "1", "Turn on/off hiding zombies which are spectating.", _, true, 0.0, true, 1.0);
     BB_EndConfig();
     
     RegConsoleCmd("sm_spectate", Command_ZombieSpectate);
@@ -165,7 +163,7 @@ public Action Command_ZombieSpectate(int client, int args)
 {
     if (!BB_IsClientValid(client))
     {
-		return Plugin_Handled;
+        return Plugin_Handled;
     }
 
     if (GetClientTeam(client) != TEAM_ZOMBIES)
