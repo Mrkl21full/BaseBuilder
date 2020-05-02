@@ -240,7 +240,14 @@
 		"pl"		"Ta komenda może być używana tylko podczas fazy budowania!"
 	}
 
-	"PlayerHUD: Current LVL"
+	"PlayerHUD: Target nick"
+	{
+		"#format"	"{1:N}"
+		"en"		"Nick: <font color='#EEEEEE'>{1}</font>"
+		"pl"		"Nick: <font color='#EEEEEE'>{1}</font>"
+	}
+
+	"PlayerHUD: Current level"
 	{
 		"#format"	"{1:d}"
 		"en"		"Current level: <font color='#11FF00'>{1} level</font>"
