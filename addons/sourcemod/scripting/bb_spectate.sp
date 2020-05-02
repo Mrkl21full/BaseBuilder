@@ -74,12 +74,16 @@ public int Native_SetZombieSpectating(Handle plugin, int numParams)
 public void OnPluginStart()
 {
     BB_IsGameCSGO();
+    BB_LoadTranslations();
 
-    g_cvHideZombiesWhileCloseToEachOthers = CreateConVar("bb_hide_zombie_while_close_to_each_others", "1", "Turn on/off hiding zombies whose is close to each others.");
-    g_cvZombieHideDistance = CreateConVar("bb_zombie_hide_distance", "9000", "Sets a distance wherein zombies are not visible for each others.");
-    g_cvHidePartyTeammatesWhileCloseToEachOthers = CreateConVar("bb_hide_party_teammates_while_close_to_each_others", "1", "Turn on/off hiding party teammates whose is close to each others.");
-    g_cvPartyTeammateHideDistance = CreateConVar("bb_party_teammate_hide_distance", "9000", "Sets a distance wherein party teammates are not visible for each others.");
-    g_cvHideZombieWhileSpectating = CreateConVar("bb_hide_spectating_zombie", "1", "Turn on/off hiding zombies which are spectating.");
+    BB_StartConfig("spectate");
+    CreateConVar("bb_spectate_version", BB_PLUGIN_VERSION, BB_PLUGIN_DESCRIPTION, FCVAR_NOTIFY | FCVAR_DONTRECORD | FCVAR_REPLICATED);
+    g_cvHideZombiesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_zombie_while_close_to_each_others", "1", "Turn on/off hiding zombies whose is close to each others.");
+    g_cvZombieHideDistance = AutoExecConfig_CreateConVar("bb_zombie_hide_distance", "9000", "Sets a distance wherein zombies are not visible for each others.");
+    g_cvHidePartyTeammatesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_party_teammates_while_close_to_each_others", "1", "Turn on/off hiding party teammates whose is close to each others.");
+    g_cvPartyTeammateHideDistance = AutoExecConfig_CreateConVar("bb_party_teammate_hide_distance", "9000", "Sets a distance wherein party teammates are not visible for each others.");
+    g_cvHideZombieWhileSpectating = AutoExecConfig_CreateConVar("bb_hide_spectating_zombie", "1", "Turn on/off hiding zombies which are spectating.");
+    BB_EndConfig();
     
     RegConsoleCmd("sm_spectate", Command_ZombieSpectate);
 
