@@ -2,6 +2,7 @@ char g_sPluginTag[64];
 
 Database g_dDatabase;
 
+GlobalForward g_fwOnWarmupEnd = null;
 GlobalForward g_fwOnBuildStart = null;
 GlobalForward g_fwOnPrepStart = null;
 GlobalForward g_fwOnRoundStart = null;
@@ -10,6 +11,7 @@ GlobalForward g_fwOnRoundEnd = null;
 GlobalForward g_fwOnBlockMove = null;
 GlobalForward g_fwOnBlockStop = null;
 
+Handle g_hWarmupTimer = null;
 Handle g_hCountdownTimer = null;
 
 int g_iCountdownTime;
@@ -68,12 +70,14 @@ bool g_bIsBuildTime = false;
 bool g_bIsPrepTime = false;
 
 ConVar g_cPluginTag = null;
+ConVar g_cWarmupTime = null;
 ConVar g_cPrepTime = null;
 ConVar g_cBuildTime = null;
 ConVar g_cRoundTime = null;
 ConVar g_cInviteTime = null;
 ConVar g_cRespawnZombie = null;
 ConVar g_cMaxLocks = null;
+ConVar g_cScrambleTeams = null;
 ConVar g_cRemoveNotUsedBlocks = null;
 ConVar g_cRemoveBlockAfterDeath = null;
 ConVar g_cPushPlayersOfBlocks = null;

@@ -28,6 +28,11 @@ enum RoundStatus
 }
 
 /**
+ * Called when the warmup has ended.
+ */
+forward void BB_OnWarmupEnd();
+
+/**
  * Called when the build phase starts (also it is round start).
  */
 forward void BB_OnBuildStart();
