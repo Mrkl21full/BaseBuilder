@@ -1207,7 +1207,7 @@ void addCredits(int client, int credits, bool message = false)
         if (g_cMessageTypCredits.IntValue == 1)
         {
             char sBuffer[MAX_MESSAGE_LENGTH];
-            Format(sBuffer, sizeof(sBuffer), "<pre><font size='22' color='#13E800'>%T<br>%T</font><br><font size='18' color='#309FFF'>BaseBuilder</font></pre>", "Shop: Credits earned", client, credits, "Shop: Current credits", client, g_iPlayer[client].Credits);
+            Format(sBuffer, sizeof(sBuffer), "<pre><font size='22' color='#13E800'>%T<br>%T</font><br><font size='18' color='#309FFF'>%T</font></pre>", "Shop: Credits earned hud", client, credits, "Shop: Current credits hud", client, g_iPlayer[client].Credits, "Main: Hud footer", client);
             PrintCenterText2(client, "BaseBuilder", sBuffer);
         } 
         else 
@@ -1253,7 +1253,7 @@ void subtractCredits(int client, int credits, bool message = false)
         if (g_cMessageTypCredits.IntValue == 1)
         {
             char sBuffer[MAX_MESSAGE_LENGTH];
-            Format(sBuffer, sizeof(sBuffer), "<pre><font size='22' color='#13E800'>%T<br>%T</font><br><font size='18' color='#309FFF'>BaseBuilder</font></pre>", "Shop: Credits lost", client, credits, "Shop: Current credits", client, g_iPlayer[client].Credits);
+            Format(sBuffer, sizeof(sBuffer), "<pre><font size='22' color='#13E800'>%T<br>%T</font><br><font size='18' color='#309FFF'>%T</font></pre>", "Shop: Credits lost hud", client, credits, "Shop: Current credits hud", client, g_iPlayer[client].Credits, "Main: Hud footer", client);
             PrintCenterText2(client, "BaseBuilder", sBuffer);
         } 
         else 

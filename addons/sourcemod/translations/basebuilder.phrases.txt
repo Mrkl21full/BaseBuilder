@@ -1,5 +1,42 @@
 "Phrases"
 {
+	"Main: Hud footer"
+	{
+		"en"		"BaseBuilder"
+	}
+
+	"Main: Seconds"
+	{
+		"#format"	"{1:d}"
+		"en"		"» {1} seconds"
+		"pl"		"» {1} sekund"
+	}
+
+	"Main: Build time"
+	{
+		"en"		"Build time will end in:"
+		"pl"		"Budowanie zakończy się za:"
+	}
+
+	"Main: Preparation time"
+	{
+		"en"		"Zombies will be released in:"
+		"pl"		"Zombie zostaną wypuszczone za:"
+	}
+
+	"Main: Start"
+	{
+		"en"		"Start - GO!!!"
+		"pl"		"Start - GO!!!"
+	}
+
+	"Main: Round begun"
+	{
+		"#format"	"{1:d}"
+		"en"		"Round #{1} just begun!"
+		"pl"		"Runda #{1} została rozpoczęta!"
+	}
+
 	"Main: Suicide disabled"
 	{
 		"en"		"Suicides are disabled!"
@@ -15,7 +52,7 @@
 	"Main: Current points"
 	{
 		"#format"	"{1:d}"
-		"en"		"You have {green}{1} points{default}!"
+		"en"		"You now have {green}{1} points{default}!"
 		"pl"		"Aktualnie masz {green}{1} punktów{default}!"
 	}
 
@@ -108,6 +145,13 @@
 		"pl"		"Aktualnie masz {green}{1} kredytów{default}!"
 	}
 
+	"Shop: Current credits hud"
+	{
+		"#format"	"{1:d}"
+		"en"		"You have {1} credits!"
+		"pl"		"Aktualnie masz {1} kredytów!"
+	}
+
 	"Shop: Credits earned"
 	{
 		"#format"	"{1:d}"
@@ -115,11 +159,25 @@
 		"pl"		"Otrzymałeś {green}+{1} kredytów{default}!"
 	}
 
+	"Shop: Credits earned hud"
+	{
+		"#format"	"{1:d}"
+		"en"		"You earned +{1} credits!"
+		"pl"		"Otrzymałeś +{1} kredytów!"
+	}
+
 	"Shop: Credits lost"
 	{
 		"#format"	"{1:d}"
 		"en"		"You lost {green}-{1} credits{default}!"
-		"pl"		"Straciłęś {green}-{1} kredytów{default}!"
+		"pl"		"Straciłeś {green}-{1} kredytów{default}!"
+	}
+
+	"Shop: Credits lost hud"
+	{
+		"#format"	"{1:d}"
+		"en"		"You los -{1} credits!"
+		"pl"		"Straciłeś -{1} kredytów!"
 	}
 
 	"Shop: Bought item"

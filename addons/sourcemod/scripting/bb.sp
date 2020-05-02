@@ -401,22 +401,172 @@ public void OnClientDisconnect(int client)
 
 public Action Event_OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 {
-	// TODO: Round start
+	if (BB_IsWarmUp())
+	{
+		return;
+	}
+
+	BB_ClearTimer(g_hCountdownTimer);
+
+	// TODO: Build phase start sound
+
+	LoopValidClients(i)
+	{
+		g_iPlayer[i].iLocks = 0;
+		g_iPlayer[i].iRespawn = 0;
+		g_iPlayer[i].iInPartyWith = -1;
+		g_iPlayer[i].bIsInParty = false;
+		g_iPlayer[i].bPartyOwner = false;
+		g_iPlayer[i].bWasBuilderThisRound = GetClientTeam(i) == TEAM_BUILDERS;
+
+		CS_SetMVPCount(i, g_iPlayer[i].iLevel);
+	}
+
+	g_iStatus = Round_Building;
+	g_iCountdownTime = g_cBuildTime.IntValue;
+	g_hCountdownTimer = CreateTimer(1.0, Timer_Build, _, TIMER_REPEAT);
+
+	GameRules_SetProp("m_iRoundTime", g_cBuildTime.IntValue + g_cPrepTime.IntValue + g_cRoundTime.IntValue, 4, 0, true);
+
+	Call_StartForward(g_fwOnBuildStart);
+	Call_Finish();
+}
+
+public Action Timer_Build(Handle timer)
+{
+	char sBuffer[1024];
+
+	LoopValidClients(i)
+	{
+		Format(sBuffer, sizeof(sBuffer), "<pre><font size='22' color='#FFA500'>%T<br>%T</font><br><font size='18' color='#309FFF'>%T</font></pre>", "Main: Build time", i, "Main: Seconds", i, g_iCountdownTime, "Main: Hud footer", i);
+		PrintCenterText2(i, "BaseBuilder", sBuffer);
+	}
+
+	switch(g_iCountdownTime--)
+	{
+		case 120: { /* TODO: Sound */ }
+		case 60: { /* TODO: Sound */ }
+		case 30: { /* TODO: Sound */ }
+		case 10: { /* TODO: Sound */ }
+		case 5: { /* TODO: Sound */ }
+		case 0: {
+			BB_ClearTimer(g_hCountdownTimer);
+
+			LoopValidClients(i)
+			{
+				if (GetClientTeam(i) == TEAM_BUILDERS)
+				{
+					// StoppedMovingBlock(i);
+					CS_RespawnPlayer(i);
+				}
+			}
+
+			RemoveBlocks(1, "prep");	
+
+			g_iStatus = Round_Preparation;
+			g_iCountdownTime = g_cPrepTime.IntValue;
+			g_hCountdownTimer = CreateTimer(1.0, Timer_PrepTime, _, TIMER_REPEAT);
+
+			// TODO: Prep phase start sound
+
+			Call_StartForward(g_fwOnPrepStart);
+			Call_Finish();
+		}
+	}
+}
+
+public Action Timer_PrepTime(Handle timer)
+{
+	char sBuffer[1024];
+	
+	LoopValidClients(i)
+	{
+		Format(sBuffer, sizeof(sBuffer), "<pre><font size='22' color='#FFA500'>%T<br>%T</font><br><font size='18' color='#309FFF'>%T</font></pre>", "Main: Preparation time", i, "Main: Seconds", i, g_iCountdownTime, "Main: Hud footer", i);
+		PrintCenterText2(i, "BaseBuilder", sBuffer);
+	}
+
+	if(g_iCountdownTime-- <= 0)
+	{
+		BB_ClearTimer(g_hCountdownTimer);
+
+		LoopValidClients(i)
+		{
+			Format(sBuffer, sizeof(sBuffer), "<pre><font size='22' color='#44FF22'>%T</font><br><br><font size='18' color='#309FFF'>%T</font></pre>", "Main: Start", i, "Main: Hud footer", i);
+			PrintCenterText2(i, "BaseBuilder", sBuffer);
+		}
+
+		switch(GetRandomInt(1, 2))
+		{
+			case 1: { /* Start 1 */ }
+			default: { /* Start 2 */ }
+		}
+
+		char sQuery[256];
+		Format(sQuery, sizeof(sQuery), "INSERT INTO bb_rounds (Start) VALUES (UNIX_TIMESTAMP())");
+		g_dDatabase.Query(SQL_InsertRound, sQuery);
+	}
 }
 
 public Action Event_OnRoundEnd(Event event, const char[] name, bool dontBroadcast)
 {
-	// TODO: Round end
+	if (BB_IsWarmUp())
+	{
+		return;
+	}
 }
 
 public Action Event_OnPlayerTeam(Event event, const char[] name, bool dontBroadcast)
 {
-	// TODO: Team change
+	int client = GetClientOfUserId(event.GetInt("userid"));
+
+	if (!BB_IsClientValid(client) || g_iPlayer[client].bWasAlreadyInServer)
+	{
+		return Plugin_Handled;
+	}
+	
+	g_iPlayer[client].bWasAlreadyInServer = true;
+	
+	int team = event.GetInt("team");
+
+	if (g_iStatus == Round_Active && team == TEAM_BUILDERS)
+	{
+		CS_SwitchTeam(client, TEAM_ZOMBIES);
+		g_iPlayer[client].bWasBuilderThisRound = true;
+		CreateTimer(0.0, Timer_RespawnPlayer, client);
+	}
+	
+	return Plugin_Handled;
 }
 
 public Action Event_OnPlayerSpawn(Event event, const char[] name, bool dontBroadcast)
 {
-	// TODO: Player spawn
+	int client = GetClientOfUserId(event.GetInt("userid"));
+
+	if (!BB_IsClientValid(client))
+	{
+		return;
+	}
+
+	if (GetClientTeam(client) == TEAM_BUILDERS)
+	{
+		g_iPlayer[client].bWasBuilderThisRound = true;
+
+		if (g_cPushPlayersOfBlocks.BoolValue)
+		{
+			SDKHook(client, SDKHook_StartTouch, OnStartTouch);
+			SDKHook(client, SDKHook_EndTouch, OnEndTouch);
+		}
+	} else {
+		SDKUnhook(client, SDKHook_StartTouch, OnStartTouch);
+		SDKUnhook(client, SDKHook_EndTouch, OnEndTouch);
+	}
+
+	CS_SetMVPCount(client, g_iPlayer[client].iLevel);
+
+	SetEntData(client, g_iCollisionOffset, 2, 1, true);
+
+	g_iPlayer[client].iPlayerNewEntity = -1;
+	g_iPlayer[client].iPlayerSelectedBlock = -1;
 }
 
 public Action Event_OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
@@ -426,7 +576,22 @@ public Action Event_OnPlayerDeath(Event event, const char[] name, bool dontBroad
 
 public Action Event_OnPlayerHurt(Event event, const char[] name, bool dontBroadcast)
 {
-	// TODO: Player hurt
+	int client = GetClientOfUserId(event.GetInt("userid"));
+	int attacker = GetClientOfUserId(event.GetInt("attacker"));
+
+	if (!BB_IsClientValid(client) || !BB_IsClientValid(attacker) || client == attacker)
+	{
+		return Plugin_Handled;
+	}
+	
+	SetEntProp(client, Prop_Data, "m_ArmorValue", 100, 4);
+	
+	if (GetClientTeam(attacker) == TEAM_ZOMBIES && g_iStatus == Round_Active)
+	{
+		// TODO: Hurt sound
+	}
+
+	return Plugin_Handled;
 }
 
 public Action SoundHook(int c[MAXPLAYERS], int &nc, char sample[PLATFORM_MAX_PATH], int &e, int &ch, float &v, int &le, int &p, int &f, char se[PLATFORM_MAX_PATH], int &s)
