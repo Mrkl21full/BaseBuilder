@@ -12,11 +12,13 @@
 
 Handle g_hTimer = null;
 
-ConVar g_cvHideZombiesWhileCloseToEachOthers;
-ConVar g_cvZombieHideDistance;
-ConVar g_cvHidePartyTeammatesWhileCloseToEachOthers;
-ConVar g_cvPartyTeammateHideDistance;
-ConVar g_cvHideZombieWhileSpectating;
+ConVar g_cHideZombiesWhileCloseToEachOthers;
+ConVar g_cZombieHideDistance;
+ConVar g_cHidePartyTeammatesWhileCloseToEachOthers;
+ConVar g_cPartyTeammateHideDistance;
+ConVar g_cHideZombieWhileSpectating;
+ConVar g_cPluginTag;
+char g_sPluginTag[64];
 
 enum struct PlayerData 
 {
@@ -78,11 +80,11 @@ public void OnPluginStart()
 
     BB_StartConfig("spectate");
     CreateConVar("bb_spectate_version", BB_PLUGIN_VERSION, BB_PLUGIN_DESCRIPTION, FCVAR_NOTIFY | FCVAR_DONTRECORD | FCVAR_REPLICATED);
-    g_cvHideZombiesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_zombie_while_close_to_each_others", "1", "Turn on/off hiding zombies whose is close to each others.");
-    g_cvZombieHideDistance = AutoExecConfig_CreateConVar("bb_zombie_hide_distance", "9000", "Sets a distance wherein zombies are not visible for each others.");
-    g_cvHidePartyTeammatesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_party_teammates_while_close_to_each_others", "1", "Turn on/off hiding party teammates whose is close to each others.");
-    g_cvPartyTeammateHideDistance = AutoExecConfig_CreateConVar("bb_party_teammate_hide_distance", "9000", "Sets a distance wherein party teammates are not visible for each others.");
-    g_cvHideZombieWhileSpectating = AutoExecConfig_CreateConVar("bb_hide_spectating_zombie", "1", "Turn on/off hiding zombies which are spectating.");
+    g_cHideZombiesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_zombie_while_close_to_each_others", "1", "Turn on/off hiding zombies whose is close to each others.");
+    g_cZombieHideDistance = AutoExecConfig_CreateConVar("bb_zombie_hide_distance", "9000", "Sets a distance wherein zombies are not visible for each others.");
+    g_cHidePartyTeammatesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_party_teammates_while_close_to_each_others", "1", "Turn on/off hiding party teammates whose is close to each others.");
+    g_cPartyTeammateHideDistance = AutoExecConfig_CreateConVar("bb_party_teammate_hide_distance", "9000", "Sets a distance wherein party teammates are not visible for each others.");
+    g_cHideZombieWhileSpectating = AutoExecConfig_CreateConVar("bb_hide_spectating_zombie", "1", "Turn on/off hiding zombies which are spectating.");
     BB_EndConfig();
     
     RegConsoleCmd("sm_spectate", Command_ZombieSpectate);
@@ -90,6 +92,20 @@ public void OnPluginStart()
     LoopValidClients(i)
     {
         OnClientPutInServer(i);
+    }
+}
+
+public void OnConfigsExecuted()
+{
+    g_cPluginTag = FindConVar("bb_plugin_tag");
+    g_cPluginTag.AddChangeHook(OnConVarChanged);
+    g_cPluginTag.GetString(g_sPluginTag, sizeof(g_sPluginTag));
+}
+
+public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+    if(convar == g_cPluginTag){
+        g_cPluginTag.GetString(g_sPluginTag, sizeof(g_sPluginTag));
     }
 }
 
@@ -124,13 +140,13 @@ public Action Command_ZombieSpectate(int client, int args)
 
     if (GetClientTeam(client) != TEAM_ZOMBIES)
     {
-        CPrintToChat(client, "Only zombies can use this command!");
+        CPrintToChat(client, "%s %T", g_sPluginTag, "Spectate: Command only for zombies", client);
         return Plugin_Handled;
     }
 
     if (BB_GetRoundStatus() != Round_Building)
     {
-        CPrintToChat(client, "This command can be used only while building phase!");
+        CPrintToChat(client, "%s %T", g_sPluginTag, "Spectate: Command can be use in building phase", client);
         return Plugin_Handled;
     }
 
@@ -187,12 +203,12 @@ public Action Hook_SetTransmit(int entity, int client)
         return Plugin_Continue;
     }
 
-    if (IsPlayerAlive(client) && IsPlayerAlive(entity) && GetClientTeam(entity) == TEAM_ZOMBIES && GetClientTeam(client) == TEAM_ZOMBIES && g_cvHideZombiesWhileCloseToEachOthers.BoolValue && g_iPlayer[client].iDistance[entity] <= g_cvZombieHideDistance.IntValue)
+    if (IsPlayerAlive(client) && IsPlayerAlive(entity) && GetClientTeam(entity) == TEAM_ZOMBIES && GetClientTeam(client) == TEAM_ZOMBIES && g_cHideZombiesWhileCloseToEachOthers.BoolValue && g_iPlayer[client].iDistance[entity] <= g_cZombieHideDistance.IntValue)
     {
         return Plugin_Handled;
     }
 
-    if (IsPlayerAlive(client) && IsPlayerAlive(entity) && GetClientTeam(entity) == TEAM_BUILDERS && GetClientTeam(client) == TEAM_BUILDERS && BB_IsClientInParty(client) && BB_GetClientPartyPerson(client) == entity && g_cvHidePartyTeammatesWhileCloseToEachOthers.BoolValue && g_iPlayer[client].iDistance[entity] <= g_cvPartyTeammateHideDistance.IntValue && BB_GetRoundStatus() == Round_Preparation)
+    if (IsPlayerAlive(client) && IsPlayerAlive(entity) && GetClientTeam(entity) == TEAM_BUILDERS && GetClientTeam(client) == TEAM_BUILDERS && BB_IsClientInParty(client) && BB_GetClientPartyPerson(client) == entity && g_cHidePartyTeammatesWhileCloseToEachOthers.BoolValue && g_iPlayer[client].iDistance[entity] <= g_cPartyTeammateHideDistance.IntValue && BB_GetRoundStatus() == Round_Preparation)
     {
         return Plugin_Handled;
     }
@@ -202,7 +218,7 @@ public Action Hook_SetTransmit(int entity, int client)
         return Plugin_Continue;
     }
 
-    if (IsPlayerAlive(client) && g_iPlayer[entity].bIsSpectating && g_cvHideZombieWhileSpectating.BoolValue) 
+    if (IsPlayerAlive(client) && g_iPlayer[entity].bIsSpectating && g_cHideZombieWhileSpectating.BoolValue) 
     {
         return Plugin_Handled;
     }   

@@ -100,7 +100,7 @@
 		"en"		"You team member left the server!"
 		"pl"		"Twój kolega z party wyszedł z serwera!"
 	}
-
+	
 	"Shop: Title"
 	{
 		"#format"	"{1:d}"
@@ -226,5 +226,17 @@
 		"#format"	"{1:s}"
 		"en"		"Item '{1}' has found!"
 		"pl"		"Nie znaleziono '{1}'!"
+	}
+
+	"Spectate: Command only for zombies"
+	{
+		"en"		"Only zombies can use this command!"
+		"pl"		"Tylko zombie mogą używać tej komendy!"
+	}
+
+	"Spectate: Command can be use in building phase"
+	{
+		"en"		"This command can be used only in building phase!"
+		"pl"		"Ta komenda może być używana tylko podczas fazy budowania!"
 	}
 }
