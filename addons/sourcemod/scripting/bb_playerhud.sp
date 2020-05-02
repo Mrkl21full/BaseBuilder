@@ -102,7 +102,7 @@ public Action Timer_UpdateText(Handle timer)
 public bool PrepareText(int client, int target, char[] sHintText, int iHintTextLength)
 {
     char sPlayerName[256];
-    Format(sPlayerName, sizeof(sPlayerName), "%T", "PlayerHUD: Current target", client, target);
+    Format(sPlayerName, sizeof(sPlayerName), "%T", "PlayerHUD: Target nick", client, target);
 
     char sPlayerLevel[128];
     Format(sPlayerLevel, sizeof(sPlayerLevel), "%T", "PlayerHUD: Current level", client, BB_GetClientLevel(target));
@@ -111,8 +111,9 @@ public bool PrepareText(int client, int target, char[] sHintText, int iHintTextL
     {
         int iHealth = GetEntProp(target, Prop_Send, "m_iHealth");
         
-        char sPlayerHealth[128];
-        Format(sPlayerHealth, sizeof(sPlayerHealth), "%T", "PlayerHUD: Health points", client, iHealth >= 2200 ? "#11FF00" : (iHealth >= 850 ? "#EB9900" : "#B80000"), iHealth);
+        char sColor[8], sPlayerHealth[128];
+        Format(sColor, sizeof(sColor), "%s", iHealth >= 2200 ? "#11FF00" : (iHealth >= 850 ? "#EB9900" : "#B80000"));
+        Format(sPlayerHealth, sizeof(sPlayerHealth), "%T", "PlayerHUD: Health points", client, sColor, iHealth);
 
         Format(sHintText, iHintTextLength, "<pre>%s<br>%s<br>%s</pre>", sPlayerName, sPlayerHealth, sPlayerLevel);
     }

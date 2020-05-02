@@ -4,18 +4,18 @@
 #define _basebuilder_spectate_included
 
 /**
- * Check if zombie is testing CT's bases.
+ * Check if zombie is spectating builder bases.
  *
  * @param client            Client index.
  *
+ * @return                  True if spectating, false otherwise.
  */
 native bool BB_IsZombieSpectating(int client);
 
 /**
- * Starts or stops zombie base testing.
+ * Change player spectating status.
  *
  * @param client            Client index.
- * @param value             1 - Set to testing, 0 - Stop testing
- *
+ * @param value             True if spectating, false otherwise.
  */
-native void BB_SetZombieSpectating(int client, int value);
+native void BB_SetZombieSpectating(int client, bool value);

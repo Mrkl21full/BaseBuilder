@@ -3,13 +3,13 @@
 
 #include <sourcemod>
 #include <sdkhooks>
-#include <multicolors>
-#include <emitsoundany>
 #include <basebuilder>
 #include <basebuilder_spectate>
 #include <basebuilder_playerhud>
 
-#define PLUGIN_NAME BB_PLUGIN_NAME ... " - Zombie spectating"
+#define PLUGIN_NAME BB_PLUGIN_NAME ... " - Spectate"
+
+bool g_bPlayerHud = false;
 
 Handle g_hTimer = null;
 
@@ -44,33 +44,35 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     CreateNative("BB_IsZombieSpectating", Native_IsZombieSpectating);
     CreateNative("BB_SetZombieSpectating", Native_SetZombieSpectating);
 
-    RegPluginLibrary("basebuilder_basetesting");
+    RegPluginLibrary("basebuilder_spectate");
 
     return APLRes_Success;
 }
 
 public int Native_IsZombieSpectating(Handle plugin, int numParams)
 {
-	return g_iPlayer[GetNativeCell(1)].bIsSpectating;
+    return g_iPlayer[GetNativeCell(1)].bIsSpectating;
 }
 
 public int Native_SetZombieSpectating(Handle plugin, int numParams)
 {
     int client = GetNativeCell(1);
+    bool mode = view_as<bool>(GetNativeCell(2));
 
-    if (view_as<bool>(GetNativeCell(2)))
+    g_iPlayer[client].bIsSpectating = mode;
+
+    if (g_bPlayerHud)
     {
-        g_iPlayer[client].bIsSpectating = true;
+        BB_SetPlayerVisibilityOnHud(client, !mode);
+    }
+
+    if (mode)
+    {
         BB_TeleportToBuilders(client);
-        BB_SetPlayerVisibilityOnHud(client, false);
-        CPrintToChat(client, "Now you are testing Builders bases!");
     }
     else
     {
-        g_iPlayer[client].bIsSpectating = false;
         BB_TeleportToZombies(client);
-        BB_SetPlayerVisibilityOnHud(client, true);
-        CPrintToChat(client, "You went back home!");
     }
 }
 
@@ -81,18 +83,42 @@ public void OnPluginStart()
 
     BB_StartConfig("spectate");
     CreateConVar("bb_spectate_version", BB_PLUGIN_VERSION, BB_PLUGIN_DESCRIPTION, FCVAR_NOTIFY | FCVAR_DONTRECORD | FCVAR_REPLICATED);
-    g_cHideZombiesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_zombie_while_close_to_each_others", "1", "Turn on/off hiding zombies whose is close to each others.");
-    g_cZombieHideDistance = AutoExecConfig_CreateConVar("bb_zombie_hide_distance", "9000", "Sets a distance wherein zombies are not visible for each others.");
-    g_cHidePartyTeammatesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_party_teammates_while_close_to_each_others", "1", "Turn on/off hiding party teammates whose is close to each others.");
-    g_cPartyTeammateHideDistance = AutoExecConfig_CreateConVar("bb_party_teammate_hide_distance", "9000", "Sets a distance wherein party teammates are not visible for each others.");
-    g_cHideZombieWhileSpectating = AutoExecConfig_CreateConVar("bb_hide_spectating_zombie", "1", "Turn on/off hiding zombies which are spectating.");
+    g_cHideZombiesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_zombie_while_close_to_each_others", "1", "Turn on/off hiding zombies whose is close to each others.", _, true, 0.0, true, 1.0);
+    g_cZombieHideDistance = AutoExecConfig_CreateConVar("bb_zombie_hide_distance", "9000", "Sets a distance wherein zombies are not visible for each others.", _, true, 5000.0);
+    g_cHidePartyTeammatesWhileCloseToEachOthers = AutoExecConfig_CreateConVar("bb_hide_party_teammates_while_close_to_each_others", "1", "Turn on/off hiding party teammates whose is close to each others.", _, true, 0.0, true, 1.0);
+    g_cPartyTeammateHideDistance = AutoExecConfig_CreateConVar("bb_party_teammate_hide_distance", "9000", "Sets a distance wherein party teammates are not visible for each others.", _, true, 5000.0);
+    g_cHideZombieWhileSpectating = AutoExecConfig_CreateConVar("bb_hide_spectating_zombie", "1", "Turn on/off hiding zombies which are spectating.", _, true, 0.0, true, 1.0);
     BB_EndConfig();
-    
+
     RegConsoleCmd("sm_spectate", Command_ZombieSpectate);
 
     LoopValidClients(i)
     {
         OnClientPutInServer(i);
+    }
+}
+
+public void OnAllPluginsLoaded()
+{
+    if (LibraryExists("basebuilder_playerhud"))
+    {
+        g_bPlayerHud = true;
+    }
+}
+
+public void OnLibraryAdded(const char[] library)
+{
+    if (StrEqual(library, "basebuilder_playerhud", false))
+    {
+        g_bPlayerHud = true;
+    }
+}
+
+public void OnLibraryRemoved(const char[] library)
+{
+    if (StrEqual(library, "basebuilder_playerhud", false))
+    {
+        g_bPlayerHud = false;
     }
 }
 
@@ -105,7 +131,8 @@ public void OnConfigsExecuted()
 
 public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-    if(convar == g_cPluginTag){
+    if (convar == g_cPluginTag)
+    {
         g_cPluginTag.GetString(g_sPluginTag, sizeof(g_sPluginTag));
     }
 }
@@ -136,7 +163,7 @@ public Action Command_ZombieSpectate(int client, int args)
 {
     if (!BB_IsClientValid(client))
     {
-		return Plugin_Handled;
+        return Plugin_Handled;
     }
 
     if (GetClientTeam(client) != TEAM_ZOMBIES)
