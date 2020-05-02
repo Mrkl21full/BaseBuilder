@@ -100,7 +100,7 @@
 		"en"		"You team member left the server!"
 		"pl"		"Twój kolega z party wyszedł z serwera!"
 	}
-	
+
 	"Shop: Title"
 	{
 		"#format"	"{1:d}"
