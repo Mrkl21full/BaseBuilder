@@ -9,7 +9,9 @@
 #include <basebuilder_spectate>
 #include <basebuilder_playerhud>
 
-#define PLUGIN_NAME BB_PLUGIN_NAME ... " - Zombie spectating"
+#define PLUGIN_NAME BB_PLUGIN_NAME ... " - Spectate"
+
+bool g_bPlayerHud = false;
 
 Handle g_hTimer = null;
 
@@ -18,6 +20,7 @@ ConVar g_cZombieHideDistance;
 ConVar g_cHidePartyTeammatesWhileCloseToEachOthers;
 ConVar g_cPartyTeammateHideDistance;
 ConVar g_cHideZombieWhileSpectating;
+
 ConVar g_cPluginTag;
 char g_sPluginTag[64];
 
@@ -44,7 +47,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     CreateNative("BB_IsZombieSpectating", Native_IsZombieSpectating);
     CreateNative("BB_SetZombieSpectating", Native_SetZombieSpectating);
 
-    RegPluginLibrary("basebuilder_basetesting");
+    RegPluginLibrary("basebuilder_spectate");
 
     return APLRes_Success;
 }
@@ -57,20 +60,22 @@ public int Native_IsZombieSpectating(Handle plugin, int numParams)
 public int Native_SetZombieSpectating(Handle plugin, int numParams)
 {
     int client = GetNativeCell(1);
+    bool mode = view_as<bool>(GetNativeCell(2));
 
-    if (view_as<bool>(GetNativeCell(2)))
+    g_iPlayer[client].bIsSpectating = mode;
+
+    if (g_bPlayerHud)
     {
-        g_iPlayer[client].bIsSpectating = true;
+        BB_SetPlayerVisibilityOnHud(client, !mode);
+    }
+
+    if (mode)
+    {
         BB_TeleportToBuilders(client);
-        BB_SetPlayerVisibilityOnHud(client, false);
-        CPrintToChat(client, "Now you are testing Builders bases!");
     }
     else
     {
-        g_iPlayer[client].bIsSpectating = false;
         BB_TeleportToZombies(client);
-        BB_SetPlayerVisibilityOnHud(client, true);
-        CPrintToChat(client, "You went back home!");
     }
 }
 
@@ -93,6 +98,30 @@ public void OnPluginStart()
     LoopValidClients(i)
     {
         OnClientPutInServer(i);
+    }
+}
+
+public void OnAllPluginsLoaded()
+{
+    if (LibraryExists("basebuilder_playerhud"))
+    {
+        g_bPlayerHud = true;
+    }
+}
+
+public void OnLibraryAdded(const char[] library)
+{
+    if (StrEqual(library, "basebuilder_playerhud", false))
+    {
+        g_bPlayerHud = true;
+    }
+}
+
+public void OnLibraryRemoved(const char[] library)
+{
+    if (StrEqual(library, "basebuilder_playerhud", false))
+    {
+        g_bPlayerHud = false;
     }
 }
 
