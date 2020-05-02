@@ -293,6 +293,23 @@ stock void BB_SetClientHealth(int client, int health = 100)
 }
 
 /**
+ * Check if zombie is testing CT's bases.
+ *
+ * @param client            Client index.
+ *
+ */
+native bool BB_IsClientTesting(int client);
+
+/**
+ * Starts or stops zombie base testing.
+ *
+ * @param client            Client index.
+ * @param value             1 - Set to testing, 0 - Stop testing
+ *
+ */
+native void BB_SetClientTesting(int client, int value);
+
+/**
  * Check if player has a knife.
  *
  * @param client            Client index.
