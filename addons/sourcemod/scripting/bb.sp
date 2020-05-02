@@ -108,7 +108,33 @@ public void OnPluginStart()
 
 public void OnConfigsExecuted()
 {
+	BB_ClearTimer(g_hWarmupTimer);
+
 	g_cPluginTag.GetString(g_sPluginTag, sizeof(g_sPluginTag));
+
+	if (g_cWarmupTime.FloatValue)
+	{
+		SetConVarInt(FindConVar("mp_warmuptime"), g_cWarmupTime.IntValue);
+		SetConVarInt(FindConVar("mp_do_warmup_period"), 1);
+
+		g_hWarmupTimer = CreateTimer(g_cWarmupTime.FloatValue, Timer_WarmupEnd);
+	}
+	else
+	{
+		SetConVarInt(FindConVar("mp_warmuptime"), 0);
+		SetConVarInt(FindConVar("mp_do_warmup_period"), 0);
+
+		Call_StartForward(g_fwOnWarmupEnd);
+		Call_Finish();
+	}
+}
+
+public Action Timer_WarmupEnd(Handle timer)
+{
+	BB_ClearTimer(g_hWarmupTimer);
+
+	Call_StartForward(g_fwOnWarmupEnd);
+	Call_Finish();
 }
 
 public void BB_OnSQLConnect(Database db) 
@@ -166,6 +192,14 @@ public void OnMapEnd()
 	BB_ClearTimer(g_hCountdownTimer);
 
 	g_iStatus = Round_Inactive;
+}
+
+public void BB_OnWarmupEnd()
+{
+	if (g_cScrambleTeams.BoolValue)
+	{
+		ServerCommand("mp_scrambleteams");
+	}
 }
 
 public void OnGameFrame()

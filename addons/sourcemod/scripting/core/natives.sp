@@ -1,5 +1,6 @@
 void InitForwards()
 {
+    g_fwOnWarmupEnd = new GlobalForward("BB_OnWarmupEnd", ET_Ignore);
     g_fwOnBuildStart = new GlobalForward("BB_OnBuildStart", ET_Ignore);
     g_fwOnPrepStart = new GlobalForward("BB_OnPrepStart", ET_Ignore);
     g_fwOnRoundStart = new GlobalForward("BB_OnRoundStart", ET_Ignore, Param_Cell, Param_Cell, Param_Cell);

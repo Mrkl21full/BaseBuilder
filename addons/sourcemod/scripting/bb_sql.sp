@@ -193,12 +193,16 @@ public void SQL_QueryCB(Database db, DBResultSet results, const char[] error, Da
     if (db == null || strlen(error) > 0)
     {
         pack.Reset();
-        char sBuffer[128];
-        pack.ReadString(sBuffer, sizeof(sBuffer));
 
-        LogError("[SQL] (%s) Query failed: %s", sBuffer, error);
+        if (StrContains(error, "duplicate column name", false) == -1)
+        {
+            char sBuffer[128];
+            pack.ReadString(sBuffer, sizeof(sBuffer));
+
+            LogError("[SQL] (%s) Query failed: %s", sBuffer, error);
+        }
     }
-    
+
     delete pack;
 }
 
