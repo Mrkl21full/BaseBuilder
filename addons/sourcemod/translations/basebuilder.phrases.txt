@@ -227,4 +227,37 @@
 		"en"		"Item '{1}' has found!"
 		"pl"		"Nie znaleziono '{1}'!"
 	}
+
+	"Spectate: Command only for zombies"
+	{
+		"en"		"Only zombies can use this command!"
+		"pl"		"Tylko zombie mogą używać tej komendy!"
+	}
+
+	"Spectate: Command can be use in building phase"
+	{
+		"en"		"This command can be used only in building phase!"
+		"pl"		"Ta komenda może być używana tylko podczas fazy budowania!"
+	}
+
+	"PlayerHUD: Target nick"
+	{
+		"#format"	"{1:N}"
+		"en"		"Nick: <font color='#EEEEEE'>{1}</font>"
+		"pl"		"Nick: <font color='#EEEEEE'>{1}</font>"
+	}
+
+	"PlayerHUD: Current level"
+	{
+		"#format"	"{1:d}"
+		"en"		"Current level: <font color='#11FF00'>{1} level</font>"
+		"pl"		"Aktualny poziom: <font color='#11FF00'>{1} level</font>"
+	}
+
+	"PlayerHUD: Health points"
+	{
+		"#format"	"{1:s},{2:d}"
+		"en"		"Health Points: <font color='{1}'>{2} HP</font>"
+		"en"		"Punktów życia: <font color='{1}'>{2} HP</font>"
+	}
 }
