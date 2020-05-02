@@ -101,21 +101,18 @@ public Action Timer_UpdateText(Handle timer)
 
 public bool PrepareText(int client, int target, char[] sHintText, int iHintTextLength)
 {
-    //char sPlayerName[256];
-    //Format(sPlayerName, sizeof(sPlayerName), "Nick: <font color='%s'>%N</font>", Gangs_IsClientInGang(target) ? Gangs_GetPrefixColor(Gangs_GetGangPrefixColor(Gangs_GetClientGang(target))) : "#EEEEEE", target);
     char sPlayerName[256];
-    Format(sPlayerName, sizeof(sPlayerName), "Nick: <font color='%s'>%N</font>", "#EEEEEE", target);
+    Format(sPlayerName, sizeof(sPlayerName), "%T", "PlayerHUD: Current target", client, target);
 
     char sPlayerLevel[128];
-    Format(sPlayerLevel, sizeof(sPlayerLevel), "%T", "PlayerHUD: Current LVL", LANG_SERVER, BB_GetClientLevel(target));
-    //Format(sPlayerLevel, sizeof(sPlayerLevel), "Aktualny poziom: <font color='#11FF00'>%i level</font>", BB_GetClientLevel(target));
+    Format(sPlayerLevel, sizeof(sPlayerLevel), "%T", "PlayerHUD: Current level", client, BB_GetClientLevel(target));
 
     if (GetClientTeam(target) == TEAM_ZOMBIES)
     {
-        char sPlayerHealth[128];
         int iHealth = GetEntProp(target, Prop_Send, "m_iHealth");
-        Format(sPlayerHealth, sizeof(sPlayerHealth), "%T", "PlayerHUD: Health points", LANG_SERVER, iHealth >= 2200 ? "#11FF00" : (iHealth >= 850 ? "#EB9900" : "#B80000"), iHealth);
-        //Format(sPlayerHealth, sizeof(sPlayerLevel), "Punktów życia: <font color='%s'>%i HP</font>", iHealth >= 2200 ? "#11FF00" : (iHealth >= 850 ? "#EB9900" : "#B80000"), iHealth);
+        
+        char sPlayerHealth[128];
+        Format(sPlayerHealth, sizeof(sPlayerHealth), "%T", "PlayerHUD: Health points", client, iHealth >= 2200 ? "#11FF00" : (iHealth >= 850 ? "#EB9900" : "#B80000"), iHealth);
 
         Format(sHintText, iHintTextLength, "<pre>%s<br>%s<br>%s</pre>", sPlayerName, sPlayerHealth, sPlayerLevel);
     }
