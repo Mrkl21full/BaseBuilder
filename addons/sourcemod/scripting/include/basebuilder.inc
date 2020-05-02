@@ -150,6 +150,30 @@ native int BB_GetClientPoints(int client);
 native RoundStatus BB_GetRoundStatus();
 
 /**
+ * Returns whether a client has access to a given command string.  The string 
+ * can be any override string, as overrides can be independent of 
+ * commands.  This feature essentially allows you to create custom 
+ * flags using the override system.
+ *
+ * Note: If cvar is not set/empty, it will always return false
+ *
+ * @param client            Client index.
+ * @param command           Command name.  If the command is not found, the default 
+ *                          flags are used.
+ * @param cvar              Flag convar to use as a default, if the command or override 
+ *                          is not found.
+ * @param override_only     If true, SourceMod will not attempt to find a matching 
+ *                          command, and it will only use the default flags specified.
+ *                          Otherwise, SourceMod will ignore the default flags if 
+ *                          there is a matching admin command.
+ *
+ * @return                  True if the client has access, false otherwise.
+ *
+ * THIS TEXT WAS COPIED FROM HERE: https://github.com/alliedmodders/sourcemod/blob/6c7e29cbdbe1fe17982a4531d839be65116abca2/plugins/include/console.inc#L479
+ */
+native bool BB_CheckCommandAccess(int client, const char[] command, ConVar cvar, bool override_only = false);
+
+/**
  * Check if client index is valid.
  *
  * @param client            Client index.

@@ -26,6 +26,8 @@ void InitNatives()
     CreateNative("BB_GetClientPoints", Native_GetClientPoints);
 
     CreateNative("BB_GetRoundStatus", Native_GetRoundStatus);
+
+    CreateNative("BB_CheckCommandAccess", Native_CheckCommandAccess);
 }
 
 public int Native_GetRoundID(Handle plugin, int numParams)
@@ -111,4 +113,33 @@ public int Native_GetClientPoints(Handle plugin, int numParams)
 public int Native_GetRoundStatus(Handle plugin, int numParams)
 {
     return view_as<int>(g_iStatus);
+}
+
+public int Native_CheckCommandAccess(Handle plugin, int numParams)
+{
+    int client = GetNativeCell(1);
+
+    char sCommand[32];
+    GetNativeString(2, sCommand, sizeof(sCommand));
+
+    ConVar cvar = view_as<ConVar>(GetNativeCell(3));
+
+    bool override_only = view_as<bool>(GetNativeCell(4));
+
+    char sFlags[24];
+    cvar.GetString(sFlags, sizeof(sFlags));
+
+    if (strlen(sFlags) < 1)
+    {
+        return false;
+    }
+    
+    int iFlags = ReadFlagString(sFlags);
+    
+    if (CheckCommandAccess(client, sCommand, iFlags, override_only))
+    {
+        return true;
+    }
+
+    return false;
 }
