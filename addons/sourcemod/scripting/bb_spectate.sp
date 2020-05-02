@@ -7,6 +7,7 @@
 #include <emitsoundany>
 #include <basebuilder>
 #include <basebuilder_spectate>
+#include <basebuilder_playerhud>
 
 #define PLUGIN_NAME BB_PLUGIN_NAME ... " - Zombie spectating"
 
@@ -61,14 +62,14 @@ public int Native_SetZombieSpectating(Handle plugin, int numParams)
     {
         g_iPlayer[client].bIsSpectating = true;
         BB_TeleportToBuilders(client);
-        //BB_SetPlayerVisibilityOnHud(client, false);
+        BB_SetPlayerVisibilityOnHud(client, false);
         CPrintToChat(client, "Now you are testing Builders bases!");
     }
     else
     {
         g_iPlayer[client].bIsSpectating = false;
         BB_TeleportToZombies(client);
-        //BB_SetPlayerVisibilityOnHud(client, true);
+        BB_SetPlayerVisibilityOnHud(client, true);
         CPrintToChat(client, "You went back home!");
     }
 }
