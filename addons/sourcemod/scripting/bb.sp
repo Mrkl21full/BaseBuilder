@@ -59,6 +59,9 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_revive", Command_Respawn);
 	RegConsoleCmd("sm_r", Command_Respawn);
 
+	// Rotate
+	RegConsoleCmd("sm_rotate", Command_Rotate);
+
 	// Colors
 	RegConsoleCmd("sm_color", Command_Colors);
 	RegConsoleCmd("sm_colors", Command_Colors);
@@ -185,6 +188,11 @@ public void OnMapStart()
 	}
 
 	PrecacheSoundAny("items/flashlight1.wav", true);
+
+	if (g_cLoadConvars.BoolValue)
+	{
+		ServerCommand("exec basebuilder/extra/game_convars.cfg");
+	}
 }
 
 public void OnMapEnd()
@@ -340,7 +348,7 @@ public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
 
 public void OnClientPutInServer(int client)
 {
-	if (!BB_IsClientValid(client))
+	if (!BB_IsClientValid(client) || IsFakeClient(client))
 	{
 		return;
 	}
@@ -356,6 +364,8 @@ public void OnClientPutInServer(int client)
 	g_iPlayer[client].iPlayerPrevButtons = -1;
 	g_iPlayer[client].iPlayerSelectedBlock = -1;
 
+	g_iPlayer[client].fRotate = 45.0;
+
 	g_iPlayer[client].bIsOnIce = false;
 	g_iPlayer[client].bIsInParty = false;
 	g_iPlayer[client].bFlashlight = true;
@@ -370,7 +380,7 @@ public void OnClientPutInServer(int client)
 	GetClientAuthId(client, AuthId_SteamID64, sCommunityID, sizeof(sCommunityID));
 
 	char sQuery[256];
-	Format(sQuery, sizeof(sQuery), "SELECT Color, Points, Level FROM bb WHERE CommunityID = \"%s\"", sCommunityID);
+	Format(sQuery, sizeof(sQuery), "SELECT Rotate, Color, Points, Level FROM bb WHERE CommunityID = \"%s\"", sCommunityID);
 	g_dDatabase.Query(SQL_OnClientPutInServer, sQuery, GetClientUserId(client));
 }
 
@@ -719,6 +729,46 @@ public Action Command_Respawn(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Command_Rotate(int client, int args)
+{
+	if (!BB_IsClientValid(client))
+	{
+		return Plugin_Handled;
+	}
+
+	Menu menu = new Menu(Menu_BlockRotate);
+
+	menu.SetTitle("%T", "Main: Rotate title", client);
+
+	char sCMD[64], sDegreesList[6][32];
+	g_cBlockRotation.GetString(sCMD, sizeof(sCMD));
+
+	int iDegrees = ExplodeString(sCMD, ";", sDegreesList, sizeof(sDegreesList), sizeof(sDegreesList[]));
+
+	for (int i = 0; i < iDegrees; i++)
+	{
+		char sFormat[32];
+		Format(sFormat, sizeof(sFormat), "%T", "Main: Rotate degrees", client, sDegreesList[i]);
+		menu.AddItem(sDegreesList[i], sFormat, g_iPlayer[client].fRotate == StringToFloat(sDegreesList[i]) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT);
+	}
+
+	menu.Display(client, MENU_TIME_FOREVER);
+	return Plugin_Handled;
+}
+
+public int Menu_BlockRotate(Menu menu, MenuAction action, int client, int item)
+{
+	if (action == MenuAction_Select)
+	{
+		char sInfo[32];
+		GetMenuItem(menu, item, sInfo, sizeof(sInfo));
+
+		g_iPlayer[client].fRotate = StringToFloat(sInfo);
+
+		Command_Rotate(client, 0);
+	}
+}
+
 public Action Command_Colors(int client, int args)
 {
 	if (!BB_IsClientValid(client))
@@ -772,6 +822,46 @@ public Action Command_AdminMenu(int client, int args)
 	// TODO: Check access and add main stuff
 
 	return Plugin_Handled;
+}
+
+public Action OnPlayerRunCmd(int client, int &iButtons, int &iImpulse, float fVelocity[3], float fAngles[3], int &iWeapon) 
+{
+	if (!BB_IsClientValid(client) || !IsPlayerAlive(client) || GetClientTeam(client) == CS_TEAM_SPECTATOR)
+	{
+		return Plugin_Continue;
+	}
+
+	if ((GetClientTeam(client) == TEAM_BUILDERS && g_iStatus == Round_Building) || BB_CheckCommandAccess(client, "bb_move_blocks", g_cMoveBlocks, true))
+	{
+		if (!(g_iPlayer[client].iPlayerPrevButtons & IN_USE) && iButtons & IN_USE)
+		{
+			FirstTimePress(client);
+		} 
+		else if (iButtons & IN_USE)
+		{
+			StillPressingButton(client, iButtons);
+		}
+		else if (g_iPlayer[client].bOnceStopped)
+		{
+			StoppedMovingBlock(client);
+		}
+
+		if (iButtons & IN_RELOAD && !(g_iPlayer[client].iPlayerPrevButtons & IN_RELOAD))
+		{
+			if (g_iPlayer[client].bOnceStopped)
+			{
+				RotateBlock(client, g_iPlayer[client].iPlayerNewEntity);
+			}
+			else if (g_iStatus == Round_Building)
+			{
+				RotateBlock(client);
+			}
+		}
+
+		g_iPlayer[client].iPlayerPrevButtons = iButtons;
+	}
+
+	return Plugin_Continue;
 }
 
 public Action Timer_RespawnPlayer(Handle timer, any client)
@@ -916,7 +1006,7 @@ stock void UpdatePlayer(int client)
 	GetClientAuthId(client, AuthId_SteamID64, sCommunityID, sizeof(sCommunityID));
 
 	char sQuery[1024];
-	Format(sQuery, sizeof(sQuery), "INSERT INTO bb (CommunityID, Color, Points, Level) VALUES (\"%s\", %i, 0, 1) ON DUPLICATE KEY UPDATE Color = %d, Points = %d, Level = %d", sCommunityID, g_iPlayer[client].iColor, g_iPlayer[client].iColor, g_iPlayer[client].iPoints, g_iPlayer[client].iLevel);
+	Format(sQuery, sizeof(sQuery), "INSERT INTO bb (CommunityID, Rotate, Color, Points, Level) VALUES (\"%s\", 45.0, %i, 0, 1) ON DUPLICATE KEY UPDATE Rotate = '%.1f', Color = %d, Points = %d, Level = %d", sCommunityID, g_iPlayer[client].iColor, g_iPlayer[client].fRotate, g_iPlayer[client].iColor, g_iPlayer[client].iPoints, g_iPlayer[client].iLevel);
 	BB_Query("SQL_UpdatePlayer", sQuery);
 }
 
@@ -978,7 +1068,7 @@ stock void SetBlockOwner(int entity, int owner)
 {
 	if (!IsValidEntity(entity))
 	{
-		return 0;
+		return;
 	}
 
 	char sBuffer[64];
@@ -1041,9 +1131,9 @@ public bool TraceEntityFilterPlayer(int entity, int contentsMask)
 	return entity > MaxClients;
 }
 
-stock void RotateBlock(int client, int entity)
+stock void RotateBlock(int client, int entity = INVALID_ENT_REFERENCE)
 {
-	if (BB_IsClientValid(client))
+	if (entity == INVALID_ENT_REFERENCE)
 	{
 		entity = GetTargetBlock(client);
 	}
@@ -1056,7 +1146,7 @@ stock void RotateBlock(int client, int entity)
 			GetEntPropVector(entity, Prop_Send, "m_angRotation", fAng);
 
 			fAng[0] += 0.0;
-			fAng[1] += 45.0;
+			fAng[1] += g_iPlayer[client].fRotate;
 			fAng[2] += 0.0;
 
 			TeleportEntity(entity, NULL_VECTOR, fAng, NULL_VECTOR);
@@ -1079,6 +1169,162 @@ stock void ColorBlock(int client, int entity, bool reset)
 			int color = GetPartyColor(client);
 
 			BB_SetRenderColor(entity, g_iColorRed[color], g_iColorGreen[color], g_iColorBlue[color], 255);
+		}
+	}
+}
+
+stock void FirstTimePress(int client)
+{
+	g_iPlayer[client].iPlayerSelectedBlock = GetTargetBlock(client);
+
+	if (IsValidEntity(g_iPlayer[client].iPlayerSelectedBlock))
+	{
+		char sName[128];
+		GetEntityClassname(g_iPlayer[client].iPlayerSelectedBlock, sName, sizeof(sName));
+
+		if (!StrEqual(sName, "weaponworldmodel"))
+		{
+			int iOwner = GetBlockOwner(g_iPlayer[client].iPlayerSelectedBlock);
+			int target = g_iPlayer[client].bIsInParty ? g_iPlayer[client].iInPartyWith : -1;
+
+			if (iOwner == 0 || iOwner == client || iOwner == target)
+			{
+				g_iPlayer[client].bTakenWithNoOwner = iOwner == 0;
+				g_iPlayer[client].bOnceStopped = true;
+
+				if (!IsValidEntity(g_iPlayer[client].iPlayerNewEntity) || g_iPlayer[client].iPlayerNewEntity <= 0)
+				{
+					g_iPlayer[client].iPlayerNewEntity = CreateEntityByName("prop_dynamic");
+				}
+
+				float fTelVec[3];
+				GetAimOrigin(client, fTelVec);
+				TeleportEntity(g_iPlayer[client].iPlayerNewEntity, fTelVec, NULL_VECTOR, NULL_VECTOR);
+
+				SetVariantString("!activator");
+				AcceptEntityInput(g_iPlayer[client].iPlayerSelectedBlock, "SetParent", g_iPlayer[client].iPlayerNewEntity, g_iPlayer[client].iPlayerSelectedBlock, 0);
+
+				float fPos[3], fPlayerPos[3];
+				GetClientEyePosition(client, fPlayerPos);
+				GetEntPropVector(g_iPlayer[client].iPlayerNewEntity, Prop_Send, "m_vecOrigin", fPos);
+
+				g_iPlayer[client].fPlayerSelectedBlockDistance = GetVectorDistance(fPlayerPos, fPos);
+
+				if (g_iPlayer[client].fPlayerSelectedBlockDistance > 250.0)
+				{
+					g_iPlayer[client].fPlayerSelectedBlockDistance = 250.0;
+				}
+
+				ColorBlock(client, g_iPlayer[client].iPlayerSelectedBlock, false);
+
+				// TODO: Grab sound
+
+				SetBlockOwner(g_iPlayer[client].iPlayerSelectedBlock, client);
+				SetLastMover(g_iPlayer[client].iPlayerSelectedBlock, client);
+
+				Call_StartForward(g_fwOnBlockMove);
+				Call_PushCell(client);
+				Call_PushCell(g_iPlayer[client].iPlayerSelectedBlock);
+				Call_Finish();
+			}
+		}
+	}
+	
+}
+
+stock void StillPressingButton(int client, int &iButtons)
+{
+	if (iButtons & IN_ATTACK)
+	{
+		g_iPlayer[client].fPlayerSelectedBlockDistance += 1.0;		
+	}
+	else if (iButtons & IN_ATTACK2)
+	{
+		g_iPlayer[client].fPlayerSelectedBlockDistance -= 1.0;
+	}
+
+	MoveBlock(client);
+}
+
+stock void MoveBlock(int client)
+{
+	if (!IsValidEntity(g_iPlayer[client].iPlayerSelectedBlock) || !IsValidEntity(g_iPlayer[client].iPlayerNewEntity))
+	{
+		return;
+	}
+
+	float fPlayerPos[3], fPlayerAngle[3], fFinal[3];
+	GetClientEyePosition(client, fPlayerPos);
+	GetClientEyeAngles(client, fPlayerAngle);
+
+	AddInFrontOf(fPlayerPos, fPlayerAngle, g_iPlayer[client].fPlayerSelectedBlockDistance, fFinal);
+
+	TeleportEntity(g_iPlayer[client].iPlayerNewEntity, fFinal, NULL_VECTOR, NULL_VECTOR);
+}
+
+stock void StoppedMovingBlock(int client)
+{
+	if (IsValidEntity(g_iPlayer[client].iPlayerSelectedBlock))
+	{
+		ColorBlock(client, g_iPlayer[client].iPlayerSelectedBlock, g_iPlayer[client].bTakenWithNoOwner);
+
+		// TODO: Stop block sound
+
+		SetVariantString("!activator");
+		AcceptEntityInput(g_iPlayer[client].iPlayerSelectedBlock, "SetParent", g_iPlayer[client].iPlayerSelectedBlock, g_iPlayer[client].iPlayerSelectedBlock, 0);
+
+		Call_StartForward(g_fwOnBlockStop);
+		Call_PushCell(client);
+		Call_PushCell(g_iPlayer[client].iPlayerSelectedBlock);
+		Call_Finish();
+	}
+	
+	g_iPlayer[client].bOnceStopped = false;
+
+	if (g_iPlayer[client].bTakenWithNoOwner)
+	{
+		SetBlockOwner(g_iPlayer[client].iPlayerSelectedBlock, 0);
+		LockBlock(client, g_iPlayer[client].iPlayerSelectedBlock);
+	}
+}
+
+stock void LockBlock(int client, int entities = 0)
+{
+	if ((IsPlayerAlive(client) && GetClientTeam(client) == TEAM_BUILDERS && g_iStatus == Round_Building) || BB_CheckCommandAccess(client, "bb_lock_blocks", g_cLockBlocks, true)) {
+		int entity = (entities == 0) ? GetTargetBlock(client) : entities;
+			
+		if (entity == -1)
+		{
+			return;
+		}
+
+		int owner = GetBlockOwner(entity);
+
+		if (owner <= 0)
+		{
+			if(g_iPlayer[client].iLocks >= g_cMaxLocks.IntValue) {
+				CPrintToChat(client, "%s %T", g_sPluginTag, "Main: Block lock limit", client, g_cMaxLocks.IntValue);
+				return;
+			}
+
+			ColorBlock(client, entity, false);
+			SetBlockOwner(entity, client);
+			
+			g_iPlayer[client].iLocks++;
+		}
+		else
+		{
+			if (client != owner && BB_CheckCommandAccess(client, "bb_lock_blocks", g_cLockBlocks, true))
+			{
+				CPrintToChat(client, "%s %T", g_sPluginTag, "Main: Block blocked by", client, owner);
+			}
+			else if (!g_iPlayer[client].bOnceStopped)
+			{
+				ColorBlock(client, entity, true);
+				SetBlockOwner(entity, 0);
+
+				g_iPlayer[client].iLocks--;
+			}
 		}
 	}
 }

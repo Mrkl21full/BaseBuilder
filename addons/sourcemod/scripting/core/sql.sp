@@ -92,12 +92,14 @@ public void SQL_OnClientPutInServer(Database db, DBResultSet results, const char
 
     if (results.RowCount > 0 && results.FetchRow())
     {
-        g_iPlayer[client].iColor = results.FetchInt(0);
-        g_iPlayer[client].iPoints = results.FetchInt(1);
-        g_iPlayer[client].iLevel = results.FetchInt(2);
+        g_iPlayer[client].fRotate = results.FetchFloat(0);
+        g_iPlayer[client].iColor = results.FetchInt(1);
+        g_iPlayer[client].iPoints = results.FetchInt(2);
+        g_iPlayer[client].iLevel = results.FetchInt(3);
     }
     else
     {
+        g_iPlayer[client].fRotate = 45.0;
         g_iPlayer[client].iColor = GetRandomInt(0, sizeof(g_iColorRed) - 1);
         g_iPlayer[client].iPoints = 0;
         g_iPlayer[client].iLevel = 1;

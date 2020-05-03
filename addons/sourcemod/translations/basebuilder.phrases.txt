@@ -95,6 +95,33 @@
 		"pl"		"Możesz użyć tej komendy tylko {green}{1} razy{default} na rundę!"
 	}
 
+	"Main: Block lock limit"
+	{
+		"#format"	"{1:d}"
+		"en"		"You can lock only {green}{1} blocks{default}!"
+		"pl"		"Możesz zabezpieczyć tylko {green}{1} blocków{default}!"
+	}
+
+	"Main: Block blocked by"
+	{
+		"#format"	"{1:N}"
+		"en"		"Block locked by {green}{1}{default}!"
+		"pl"		"Blok zabezpieczony przez {green}{1}{default}!"
+	}
+
+	"Main: Rotate title"
+	{
+		"en"		"BaseBuilder » Change block rotation"
+		"pl"		"BaseBuilder » Zmień rotacje bloków"
+	}
+
+	"Main: Rotate degrees"
+	{
+		"#format"	"{1:s}"
+		"en"		"{1} degrees"
+		"pl"		"{1} stopni"
+	}
+
 	"Party: Team member left"
 	{
 		"en"		"You team member left the server!"
