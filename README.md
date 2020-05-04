@@ -10,12 +10,12 @@ Current developers
 | Steam | Github |
 |:-----:|:------:|
 | [Mrkl21full](https://steamcommunity.com/profiles/76561198191496115/) | https://github.com/Mrkl21full |
+| [K4M1s](https://steamcommunity.com/profiles/76561198883965597/) | https://github.com/K4M1s |
 
 
 Previous developers / Authors of useful plugins
 ---
 - [boomix](https://steamcommunity.com/profiles/76561198071212797/) (original author of basic features)
-- [K4M1s](https://steamcommunity.com/profiles/76561198883965597/)
 - [Any contributors](https://github.com/Mrkl21full/BaseBuilder/graphs/contributors)
 
 
