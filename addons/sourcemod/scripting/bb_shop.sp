@@ -273,7 +273,7 @@ public void BB_OnSQLConnect(Database db)
 
 void UpdatePlayer(int client, bool save = false)
 {
-    if (IsFakeClient(client) || IsClientSourceTV(client))
+    if (!BB_IsClientValid(client) || IsFakeClient(client) || IsClientSourceTV(client))
     {
         return;
     }

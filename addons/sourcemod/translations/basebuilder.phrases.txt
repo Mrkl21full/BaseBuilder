@@ -37,6 +37,13 @@
 		"pl"		"Runda #{1} została rozpoczęta!"
 	}
 
+	"Main: Next round in"
+	{
+		"#format"	"{1:.1f}"
+		"en"		"Next round will begin in {1} seconds!"
+		"pl"		"Następna runda rozpocznie się za {1} sekund!"
+	}
+
 	"Main: Suicide disabled"
 	{
 		"en"		"Suicides are disabled!"
@@ -68,6 +75,13 @@
 		"#format"	"{1:d}"
 		"en"		"Next level in {green}{1} points{default}!"
 		"pl"		"Następny level za {green}{1} punktów{default}!"
+	}
+
+	"Main: New level"
+	{
+		"#format"	"{1:N},{2:d}"
+		"en"		"{green}{1}{default} reached {green}{2} level{default}!"
+		"pl"		"{green}{1}{default} osiągnął {green}{2} level{default}!"
 	}
 
 	"Main: Flashlight enabled"
@@ -109,6 +123,19 @@
 		"pl"		"Blok zabezpieczony przez {green}{1}{default}!"
 	}
 
+	"Main: Block moved by"
+	{
+		"#format"	"{1:N}"
+		"en"		"Block moved by {green}{1}{default}!"
+		"pl"		"Blok przesunięty przez {green}{1}{default}!"
+	}
+
+	"Main: Block not moved"
+	{
+		"en"		"No one touched that block!"
+		"pl"		"Nikt nie dotykał tego bloku!"
+	}
+
 	"Main: Rotate title"
 	{
 		"en"		"BaseBuilder » Change block rotation"
@@ -120,6 +147,159 @@
 		"#format"	"{1:s}"
 		"en"		"{1} degrees"
 		"pl"		"{1} stopni"
+	}
+
+	"Color: Player colors title"
+	{
+		"en"		"BaseBuilder » Players block colors"
+		"pl"		"BaseBuilder » Kolory bloków graczy"
+	}
+
+	"Color: Change color"
+	{
+		"en"		"Change blocks color"
+		"pl"		"Zmień kolor bloków"
+	}
+
+	"Color: Change block color title"
+	{
+		"en"		"BaseBuilder » Change block color"
+		"pl"		"BaseBuilder » Zmień kolor bloku"
+	}
+
+	"Party: Builders only"
+	{
+		"en"		"You need to be builder to have party!"
+		"pl"		"Musisz być budowniczym, aby mieć drużynę!"
+	}
+
+	"Party: Not the same teams"
+	{
+		"en"		"You both need to be builders!"
+		"pl"		"Oboje musicie być budowniczymi!"
+	}
+
+	"Party: Already in team"
+	{
+		"en"		"You are already in team!"
+		"pl"		"Już jesteś w drużynie!"
+	}
+
+	"Party: Not in team"
+	{
+		"en"		"You are not in team!"
+		"pl"		"Nie jesteś w drużynie!"
+	}
+
+	"Party: Player already in team"
+	{
+		"#format"	"{1:N}"
+		"en"		"{1} is already in team!"
+		"pl"		"{1} jest już w drużynie!"
+	}
+
+	"Party: Choose teammate title"
+	{
+		"en"		"BaseBuilder » Choose party member"
+		"pl"		"BaseBuilder » Wybierz swojego towarzysza"
+	}
+
+	"Party: Empty list"
+	{
+		"en"		"No one is free to be in party"
+		"pl"		"Nikt nie jest wolny, aby być w drużynie"
+	}
+
+	"Party: Invite sended"
+	{
+		"#format"	"{1:N}"
+		"en"		"Invite sended to {green}{1}{default}!"
+		"pl"		"Zaproszenie wysłane do {green}{1}{default}!"
+	}
+
+	"Party: Target accept in"
+	{
+		"#format"	"{1:d}"
+		"en"		"Invite will be valid for {green}{1} seconds{default}!"
+		"pl"		"Zaproszenie będzie ważne prez {green}{1} sekund{default}!"
+	}
+
+	"Party: Invite from"
+	{
+		"#format"	"{1:N}"
+		"en"		"Invite from {green}{1}{default}!"
+		"pl"		"Zaproszenie od {green}{1}{default}!"
+	}
+
+	"Party: To accept it"
+	{
+		"en"		"To accept it type {green}!accept{default}!"
+		"pl"		"Zaakceptuj je wpisując {green}!accept{default}!"
+	}
+
+	"Party: To decline it"
+	{
+		"#format"	"{1:d}"
+		"en"		"To decline it wait {green}{1} seconds{default}!"
+		"pl"		"Aby odrzucić zaczekaj {green}{1} seconds{default}!"
+	}
+
+	"Party: Player declined it"
+	{
+		"en"		"You declined {green}{1}{default} invite!"
+		"pl"		"Odrzuciłeś zaproszenie {green}{1}{default}!"
+	}
+
+	"Party: Player declined it other"
+	{
+		"#format"	"{1:d}"
+		"en"		"{green}{1}{default} declined your invite!"
+		"pl"		"{green}{1}{default} odrzucił Twoje zaproszenie!"
+	}
+
+	"Party: Invite from title"
+	{
+		"#format"	"{1:d}"
+		"en"		"BaseBuilder » Invite from {1}!"
+		"pl"		"BaseBuilder » Zaproszenie od {1}!"
+	}
+
+	"Party: Accept title"
+	{
+		"en"		"Accept invite"
+		"pl"		"Przyjmij zaproszenie"
+	}
+
+	"Party: Decline title"
+	{
+		"en"		"Accept invite"
+		"pl"		"Przyjmij zaproszenie"
+	}
+
+	"Party: Not active invites"
+	{
+		"en"		"You don't have any active invites!"
+		"pl"		"Nie masz żadnych aktywnych zaproszeń!"
+	}
+
+	"Party: You shouldnt"
+	{
+		"en"		"You shound't accept that!"
+		"pl"		"Ty nie powinieneś tego akceptować!"
+	}
+
+	"Party: Team with"
+	{
+		"#format"	"{1:N}"
+		"en"		"You are in party with {green}{1}{default}!"
+		"pl"		"Jesteś w party z {green}{1}{default}!"
+	}
+
+	"Party: No longer with"
+	{
+		"#format"	"{1:N}"
+		"en"		"You are no longer in team with {green}{1}{default}!"
+		"pl"		"Nie jesteś już w drużynei z {green}{1}{default}!"
 	}
 
 	"Party: Team member left"

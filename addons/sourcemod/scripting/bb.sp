@@ -187,7 +187,42 @@ public void OnMapStart()
 		}
 	}
 
+	PrecacheSoundAny("BaseBuilder/Time_1min.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Time_2min.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Time_5sec.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Time_10sec.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Time_30sec.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Block_Drop.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Block_Grab.mp3", true); 
+	PrecacheSoundAny("BaseBuilder/Player_Hit.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Phase_Build.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Phase_Prep.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Round_Start1.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Round_Start2.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Win_Builders.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Win_Zombies.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Zombie_Kill.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Special/LevelUp.mp3", true);
+	PrecacheSoundAny("BaseBuilder/Special/Teleportation.mp3", true);
 	PrecacheSoundAny("items/flashlight1.wav", true);
+
+	AddFileToDownloadsTable("sound/BaseBuilder/Time_1min.mp3");
+	AddFileToDownloadsTable("sound/BaseBuilder/Time_2min.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Time_5sec.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Time_10sec.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Time_30sec.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Block_Drop.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Block_Grab.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Player_Hit.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Phase_Build.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Phase_Prep.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Round_Start1.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Round_Start2.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Win_Builders.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Win_Zombies.mp3"); 
+	AddFileToDownloadsTable("sound/BaseBuilder/Zombie_Kill.mp3");
+	AddFileToDownloadsTable("sound/BaseBuilder/Special/LevelUp.mp3");
+	AddFileToDownloadsTable("sound/BaseBuilder/Special/Teleportation.mp3");
 
 	if (g_cLoadConvars.BoolValue)
 	{
@@ -330,13 +365,23 @@ public Action CS_OnTerminateRound(float &delay, CSRoundEndReason &reason)
 
 	int iWinner = reason == CSRoundEnd_CTWin ? TEAM_BUILDERS : TEAM_ZOMBIES;
 
-	// TODO: Make sound which team won.
+	if (iWinner == TEAM_ZOMBIES)
+	{
+		EmitSoundToAllAny("BaseBuilder/Win_Zombies.mp3");
+	}
+	else
+	{
+		EmitSoundToAllAny("BaseBuilder/Win_Builders.mp3");
+	}
 
 	Call_StartForward(g_fwOnRoundEnd);
 	Call_PushCell(iWinner);
 	Call_Finish();
 
-	// TODO: Announce new round?
+	LoopValidClients(i)
+	{
+		CPrintToChat(i, "%s %T", g_sPluginTag, "Main: Next round in", i, delay);
+	}
 
 	char sQuery[128];
 	Format(sQuery, sizeof(sQuery), "UPDATE bb_rounds SET End = UNIX_TIMESTAMP() WHERE ID = %d", g_iRoundID);
@@ -418,7 +463,7 @@ public Action Event_OnRoundStart(Event event, const char[] name, bool dontBroadc
 
 	BB_ClearTimer(g_hCountdownTimer);
 
-	// TODO: Build phase start sound
+	EmitSoundToAllAny("BaseBuilder/Phase_Build.mp3");
 
 	LoopValidClients(i)
 	{
@@ -454,11 +499,11 @@ public Action Timer_Build(Handle timer)
 
 	switch(g_iCountdownTime--)
 	{
-		case 120: { /* TODO: Sound */ }
-		case 60: { /* TODO: Sound */ }
-		case 30: { /* TODO: Sound */ }
-		case 10: { /* TODO: Sound */ }
-		case 5: { /* TODO: Sound */ }
+		case 120: { EmitSoundToAllAny("BaseBuilder/Time_2min.mp3"); }
+		case 60: { EmitSoundToAllAny("BaseBuilder/Time_1min.mp3"); }
+		case 30: { EmitSoundToAllAny("BaseBuilder/Time_30sec.mp3"); }
+		case 10: { EmitSoundToAllAny("BaseBuilder/Time_10sec.mp3"); }
+		case 5: { EmitSoundToAllAny("BaseBuilder/Time_5sec.mp3"); }
 		case 0: {
 			BB_ClearTimer(g_hCountdownTimer);
 
@@ -466,7 +511,7 @@ public Action Timer_Build(Handle timer)
 			{
 				if (GetClientTeam(i) == TEAM_BUILDERS)
 				{
-					// StoppedMovingBlock(i);
+					StoppedMovingBlock(i);
 					CS_RespawnPlayer(i);
 				}
 			}
@@ -477,7 +522,7 @@ public Action Timer_Build(Handle timer)
 			g_iCountdownTime = g_cPrepTime.IntValue;
 			g_hCountdownTimer = CreateTimer(1.0, Timer_PrepTime, _, TIMER_REPEAT);
 
-			// TODO: Prep phase start sound
+			EmitSoundToAllAny("BaseBuilder/Phase_Prep.mp3");
 
 			Call_StartForward(g_fwOnPrepStart);
 			Call_Finish();
@@ -505,10 +550,13 @@ public Action Timer_PrepTime(Handle timer)
 			PrintCenterText2(i, "BaseBuilder", sBuffer);
 		}
 
-		switch(GetRandomInt(1, 2))
+		if (GetRandomInt(1, 2) == 1)
 		{
-			case 1: { /* Start 1 */ }
-			default: { /* Start 2 */ }
+			EmitSoundToAllAny("BaseBuilder/Round_Start1.mp3");
+		}
+		else
+		{
+			EmitSoundToAllAny("BaseBuilder/Round_Start2.mp3");
 		}
 
 		char sQuery[256];
@@ -523,6 +571,8 @@ public Action Event_OnRoundEnd(Event event, const char[] name, bool dontBroadcas
 	{
 		return;
 	}
+
+	// TODO: Round end, remove parties
 }
 
 public Action Event_OnPlayerTeam(Event event, const char[] name, bool dontBroadcast)
@@ -598,7 +648,7 @@ public Action Event_OnPlayerHurt(Event event, const char[] name, bool dontBroadc
 	
 	if (GetClientTeam(attacker) == TEAM_ZOMBIES && g_iStatus == Round_Active)
 	{
-		// TODO: Hurt sound
+		EmitSoundToAllAny("BaseBuilder/Player_Hit.mp3", attacker);
 	}
 
 	return Plugin_Handled;
@@ -627,7 +677,7 @@ public int OnEndTouch(int client, int iEnt)
 	{
 		g_iPlayer[client].bTouchingBlock = false;
 
-		SetEntityGravity(client, 1.0);
+		SetEntityGravity(client, g_iPlayer[client].fGravity);
 	}
 }
 
@@ -658,7 +708,29 @@ public int OnStartTouch(int client, int iEnt)
 		return;
 	}
 
-	// TODO: Check block owner and party member
+	int owner = GetBlockOwner(iEnt);
+
+	if (!BB_IsClientValid(owner))
+	{
+		return;
+	}
+
+	int target = g_iPlayer[client].iInPartyWith;
+
+	if (target == -1)
+	{
+		target = client;
+	}
+
+	if (owner != client && owner != target)
+	{
+		g_iPlayer[client].bIsOnIce = true;
+		g_iPlayer[client].bTouchingBlock = true;
+		g_iPlayer[client].fGravity = GetEntityGravity(client);
+
+		SetEntityGravity(client, 10.0);	
+		SlapPlayer(client, 0, false);
+	}
 }
 
 public Action Command_Points(int client, int args)
@@ -695,7 +767,21 @@ public Action Command_LastMover(int client, int args)
 		return Plugin_Handled;
 	}
 
-	// TODO: Last mover
+	int entity = GetTargetBlock(client);
+
+	if (IsValidEntity(entity))
+	{
+		int target = GetLastMover(entity);
+
+		if (BB_IsClientValid(target))
+		{
+			CPrintToChat(client, "%s %T!", g_sPluginTag, "Main: Block moved by", client, target);
+		}
+		else
+		{
+			CPrintToChat(client, "%s %T", g_sPluginTag, "Main: Block not moved", client);
+		}
+	}
 
 	return Plugin_Handled;
 }
@@ -776,24 +862,293 @@ public Action Command_Colors(int client, int args)
 		return Plugin_Handled;
 	}
 
-	// TODO: Colors
+	Menu menu = new Menu(PlayerColors);
+		
+	menu.SetTitle("%T", "Color: Player colors title", client);
 
+	char sBuffer[MAX_NAME_LENGTH];
+	Format(sBuffer, sizeof(sBuffer), "%T", "Color: Change color", client);
+
+	menu.AddItem("change", sBuffer);
+	menu.AddItem("", "", ITEMDRAW_SPACER);
+
+	LoopValidClients(i)
+	{
+		Format(sBuffer, sizeof(sBuffer), "%N - %s", i, g_sColorName[g_iPlayer[i].iColor]);
+		menu.AddItem("", sBuffer);
+	}
+	
+	menu.Display(client, MENU_TIME_FOREVER);
 	return Plugin_Handled;
+}
+
+public int PlayerColors(Menu menu, MenuAction action, int client, int item)
+{
+	if (action == MenuAction_Select)
+	{
+		char sInfo[32];
+		GetMenuItem(menu, item, sInfo, sizeof(sInfo));
+
+		if (StrEqual(sInfo, "change"))
+		{
+			Menu colors = new Menu(PlayerColors_Change);
+		
+			colors.SetTitle("%T", "Color: Change block color title", client);
+
+			char sBuffer[8];
+			for (int i = 0; i < sizeof(g_sColorName); i++)
+			{
+				Format(sBuffer, sizeof(sBuffer), "%i", i);
+				colors.AddItem(sBuffer, g_sColorName[i]);
+			}
+			
+			colors.Display(client, MENU_TIME_FOREVER);
+		}
+	}
+}
+
+public int PlayerColors_Change(Menu menu, MenuAction action, int client, int item)
+{
+	if (action == MenuAction_Select)
+	{
+		char sInfo[32];
+		GetMenuItem(menu, item, sInfo, sizeof(sInfo));
+
+		g_iPlayer[client].iColor = StringToInt(sInfo);
+
+		if (g_iPlayer[client].iLocks > 0)
+		{
+			ColorBlockByClient(client);
+		}
+	}
 }
 
 public Action Command_Party(int client, int args)
 {
-	// TODO: Party
+	if(!BB_IsClientValid(client))
+	{
+		return Plugin_Handled;
+	}
+
+	if (GetClientTeam(client) != TEAM_BUILDERS)
+	{
+		CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Builders only", client);
+		return Plugin_Handled;
+	}
+
+	if (g_iPlayer[client].bIsInParty)
+	{
+		CPrintToChat(client, "%s %T!", g_sPluginTag, "Party: Already in team", client);
+		return Plugin_Handled;
+	}
+
+	Menu menu = new Menu(PartyMenu);
+
+	menu.SetTitle("%T", "Party: Choose teammate title", client);
+
+	char sUID[8], sNick[MAX_NAME_LENGTH];
+	LoopValidClients(i)
+	{
+		if (g_iPlayer[i].bIsInParty || GetClientTeam(i) != TEAM_BUILDERS || client == i)
+		{
+			continue;
+		}
+
+		Format(sUID, sizeof(sUID), "%i", i);
+		Format(sNick, sizeof(sNick), "%N", i);
+
+		menu.AddItem(sUID, sNick);
+	}
+
+	if (strlen(sUID) <= 0)
+	{
+		Format(sNick, sizeof(sNick), "%T", "Party: Empty list", client);
+		menu.AddItem("empty", sNick);
+	}
+
+	menu.Display(client, MENU_TIME_FOREVER);
+	return Plugin_Handled;
+}
+
+public int PartyMenu(Menu menu, MenuAction action, int client, int item)
+{
+	if (action == MenuAction_Select)
+	{
+		char sInfo[32];
+		GetMenuItem(menu, item, sInfo, sizeof(sInfo));
+
+		if (!StrEqual(sInfo, "empty")) {
+			int target = StringToInt(sInfo);
+
+			if (!BB_IsClientValid(target))
+			{
+				CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Team member left", client);
+				return;
+			}
+
+			g_iPlayer[client].iInPartyWith = target;
+			g_iPlayer[target].iInPartyWith = client;
+
+			g_iPlayer[client].bPartyOwner = true;
+
+			CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Invite sended", client, target);
+			CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Target accept in", client, g_cInviteTime.IntValue);
+
+			CPrintToChat(target, "%s %T", g_sPluginTag, "Party: Invite from", target, client);
+			CPrintToChat(target, "%s %T", g_sPluginTag, "Party: To accept it", target);
+			CPrintToChat(target, "%s %T", g_sPluginTag, "Party: To decline it", target, g_cInviteTime.IntValue);
+
+			Menu invite = new Menu(PartyMenu_Invite);
+
+			invite.SetTitle("%T", "Party: Invite from title", target, client);
+
+			char sBuffer[64];
+			Format(sBuffer, sizeof(sBuffer), "%T", "Party: Accept title", target);
+			invite.AddItem("yes", sBuffer);
+
+			Format(sBuffer, sizeof(sBuffer), "%T", "Party: Decline title", target);
+			invite.AddItem("no", sBuffer);
+
+			invite.Display(target, g_cInviteTime.IntValue);
+
+			g_iPlayer[client].hInvite = CreateTimer(g_cInviteTime.FloatValue, Timer_ResetInvite, client);
+			g_iPlayer[client].hInvite = CreateTimer(g_cInviteTime.FloatValue, Timer_ResetInvite, target);
+		}
+	}
+}
+
+public int PartyMenu_Invite(Menu menu, MenuAction action, int client, int item)
+{
+	if (action == MenuAction_Select)
+	{
+		char sInfo[32];
+		GetMenuItem(menu, item, sInfo, sizeof(sInfo));
+
+		if (StrEqual(sInfo, "no"))
+		{
+			int target = g_iPlayer[client].iInPartyWith;
+
+			BB_ClearTimer(g_iPlayer[client].hInvite);
+			BB_ClearTimer(g_iPlayer[target].hInvite);
+
+			g_iPlayer[client].iInPartyWith = -1;
+			g_iPlayer[client].bPartyOwner = false;
+
+			g_iPlayer[target].iInPartyWith = -1;
+			g_iPlayer[target].bPartyOwner = false;
+
+			CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Player declined it", client, target);
+			CPrintToChat(target, "%s %T", g_sPluginTag, "Party: Player declined it other", target, client);
+		}
+		else
+		{
+			int target = g_iPlayer[client].iInPartyWith;
+
+			if (g_iPlayer[client].bIsInParty)
+			{
+				CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Already in team", client);
+				return;
+			}
+
+			if (g_iPlayer[target].bIsInParty)
+			{
+				BB_ClearTimer(g_iPlayer[client].hInvite);
+
+				g_iPlayer[client].iInPartyWith = -1;
+				g_iPlayer[client].bPartyOwner = false;
+
+				CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Player already in team", client, target);
+				return;
+			}
+			
+			AcceptInvite(client, target);
+		}
+	}
+}
+
+public Action Timer_ResetInvite(Handle timer, any client)
+{
+	if (!BB_IsClientValid(client) || g_iPlayer[client].bIsInParty)
+	{
+		return;
+	}
+
+	BB_ClearTimer(g_iPlayer[client].hInvite);
+
+	g_iPlayer[client].iInPartyWith = -1;
+	g_iPlayer[client].bPartyOwner = false;
 }
 
 public Action Command_PartyAccept(int client, int args)
 {
-	// TODO: Party accept
+	if (!BB_IsClientValid(client))
+	{
+		return Plugin_Handled;
+	}
+
+	int target = g_iPlayer[client].iInPartyWith;
+
+	if (!BB_IsClientValid(target))
+	{
+		CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Not active invites", client);
+		return Plugin_Handled;
+	}
+
+	if (g_iPlayer[client].bPartyOwner)
+	{
+		CPrintToChat(client, "%s %T", g_sPluginTag, "Party: You shouldnt", client);
+		return Plugin_Handled;
+	}
+
+	if (GetClientTeam(client) != TEAM_BUILDERS || GetClientTeam(target) != TEAM_BUILDERS)
+	{
+		CPrintToChat(client, "%s %T!", g_sPluginTag, "Party: Not the same teams", client);
+		return Plugin_Handled;
+	}
+
+	if (g_iPlayer[client].bIsInParty)
+	{
+		CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Already in team", client);
+		return Plugin_Handled;
+	}
+
+	if (g_iPlayer[target].bIsInParty)
+	{
+		CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Player already in team", client, target);
+		return Plugin_Handled;
+	}
+
+	AcceptInvite(client, target);
+	return Plugin_Handled;
 }
 
 public Action Command_PartyRemove(int client, int args)
 {
-	// TODO: Party accept
+	if (!BB_IsClientValid(client))
+	{
+		return Plugin_Handled;
+	}
+
+	if (!g_iPlayer[client].bIsInParty)
+	{
+		CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Not in team", client);
+		return Plugin_Handled;
+	}
+
+	int target = g_iPlayer[client].iInPartyWith;
+
+	g_iPlayer[client].bIsInParty = false;
+	g_iPlayer[target].bIsInParty = false;
+
+	g_iPlayer[client].iInPartyWith = -1;
+	g_iPlayer[target].iInPartyWith = -1;
+
+	// RemoveDecalAbovePlayer(client);
+	// RemoveDecalAbovePlayer(target);
+
+	CPrintToChat(client, "%s %T", g_sPluginTag, "Party: No longer with", client, target);
+	CPrintToChat(target, "%s %T", g_sPluginTag, "Party: No longer with", target, client);
+	return Plugin_Handled;
 }
 
 public Action Command_Flashlight(int client, int args)
@@ -964,7 +1319,7 @@ public Action Command_TeamChange(int client, const char[] command, int args)
 
 public Action Command_LockBlock(int client, const char[] command, int args)
 {
-	// TODO: Lock blocks
+	LockBlock(client, 0);
 }
 
 public Action OnTakeDamage(int iVictim, int &iAttacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
@@ -1008,6 +1363,63 @@ stock void UpdatePlayer(int client)
 	char sQuery[1024];
 	Format(sQuery, sizeof(sQuery), "INSERT INTO bb (CommunityID, Rotate, Color, Points, Level) VALUES (\"%s\", 45.0, %i, 0, 1) ON DUPLICATE KEY UPDATE Rotate = '%.1f', Color = %d, Points = %d, Level = %d", sCommunityID, g_iPlayer[client].iColor, g_iPlayer[client].fRotate, g_iPlayer[client].iColor, g_iPlayer[client].iPoints, g_iPlayer[client].iLevel);
 	BB_Query("SQL_UpdatePlayer", sQuery);
+}
+
+stock void CheckClientLevel(int client)
+{
+	if (g_iPlayer[client].iPoints >= RoundToCeil(((g_iPlayer[client].iLevel + 1) * 0.4) * ((g_iPlayer[client].iLevel + 1) * 35)))
+	{
+		g_iPlayer[client].iPoints = 0;
+		g_iPlayer[client].iLevel++;
+		
+		UpdatePlayer(client);
+
+		CS_SetMVPCount(client, g_iPlayer[client].iLevel);
+
+		LoopValidClients(i)
+		{
+			CPrintToChat(i, "%s %T", g_sPluginTag, "Main: New level", i, client, g_iPlayer[client].iLevel);
+		}
+
+		EmitSoundToAllAny("BaseBuilder/Special/LevelUp.mp3", client);
+	}
+}
+
+stock void AcceptInvite(int client, int target)
+{
+	g_iPlayer[client].bIsInParty = true;
+	g_iPlayer[target].bIsInParty = true;
+
+	g_iPlayer[client].iInPartyWith = target;
+	g_iPlayer[target].iInPartyWith = client;
+
+	// g_iPlayer[client].iIcon = SpawnDecalAbovePlayer(client);
+	// g_iPlayer[target].iIcon = SpawnDecalAbovePlayer(target);
+
+	char sBuffer[8];
+	IntToString(g_iPlayer[client].iInPartyWith, sBuffer, sizeof(sBuffer));
+	DispatchKeyValue(g_iPlayer[client].iIcon, "globalname", sBuffer);
+
+	IntToString(g_iPlayer[target].iInPartyWith, sBuffer, sizeof(sBuffer));
+	DispatchKeyValue(g_iPlayer[target].iIcon, "globalname", sBuffer);
+
+	// SDKHook(g_iPlayer[client].iIcon, SDKHook_SetTransmit, ShowFriendOverlay);
+	// SDKHook(g_iPlayer[target].iIcon, SDKHook_SetTransmit, ShowFriendOverlay);
+
+	CPrintToChat(client, "%s %T", g_sPluginTag, "Party: Team with", client, target);
+	CPrintToChat(target, "%s %T", g_sPluginTag, "Party: Team with", target, client);
+
+	if (g_iPlayer[client].iLocks > 0 || g_iPlayer[target].iLocks > 0)
+	{
+		if (g_iPlayer[client].bPartyOwner)
+		{
+			ColorBlockByClient(client, target);
+		}
+		else
+		{
+			ColorBlockByClient(target, client);
+		}
+	}
 }
 
 stock int GetTargetBlock(int client)
@@ -1173,6 +1585,38 @@ stock void ColorBlock(int client, int entity, bool reset)
 	}
 }
 
+stock void ColorBlockByClient(int client, int target = -1)
+{
+	int iEnt;
+
+	while ((iEnt = FindEntityByClassname(iEnt, "prop_dynamic")) != INVALID_ENT_REFERENCE)
+	{
+		if (IsValidEntity(iEnt))
+		{
+			char sName[64];
+			GetEntPropString(iEnt, Prop_Data, "m_iName", sName, sizeof(sName));
+
+			char sGlobalName[64];
+			GetEntPropString(iEnt, Prop_Data, "m_iGlobalname", sGlobalName, sizeof(sGlobalName));
+
+			if (target != INVALID_ENT_REFERENCE)
+			{
+				if (StringToInt(sName) == client || StringToInt(sName) == target || StringToInt(sGlobalName) == client || StringToInt(sGlobalName) == target)
+				{
+					ColorBlock(client, iEnt, false);
+				}
+			}
+			else
+			{
+				if (StringToInt(sName) == client || StringToInt(sGlobalName) == client)
+				{
+					ColorBlock(client, iEnt, false);
+				}
+			}
+		}
+	}
+}
+
 stock void FirstTimePress(int client)
 {
 	g_iPlayer[client].iPlayerSelectedBlock = GetTargetBlock(client);
@@ -1217,7 +1661,7 @@ stock void FirstTimePress(int client)
 
 				ColorBlock(client, g_iPlayer[client].iPlayerSelectedBlock, false);
 
-				// TODO: Grab sound
+				EmitSoundToClientAny(client, "BaseBuilder/Block_Grab.mp3");
 
 				SetBlockOwner(g_iPlayer[client].iPlayerSelectedBlock, client);
 				SetLastMover(g_iPlayer[client].iPlayerSelectedBlock, client);
@@ -1268,7 +1712,7 @@ stock void StoppedMovingBlock(int client)
 	{
 		ColorBlock(client, g_iPlayer[client].iPlayerSelectedBlock, g_iPlayer[client].bTakenWithNoOwner);
 
-		// TODO: Stop block sound
+		EmitSoundToClientAny(client, "BaseBuilder/Block_Drop.mp3");
 
 		SetVariantString("!activator");
 		AcceptEntityInput(g_iPlayer[client].iPlayerSelectedBlock, "SetParent", g_iPlayer[client].iPlayerSelectedBlock, g_iPlayer[client].iPlayerSelectedBlock, 0);
