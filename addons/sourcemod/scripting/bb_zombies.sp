@@ -17,7 +17,6 @@ KeyValues g_kvZombies;
 ConVar g_cPluginTag = null;
 char g_sPluginTag[64];
 
-ConVar g_cZombieFlags;
 ConVar g_cGravityTimerInterval;
 
 Handle g_hGravityTimer;
@@ -34,7 +33,7 @@ enum struct Zombie
     float fGravity;
     float fSpeed;
 
-    char sFlags[21];
+    char sFlag[1];
 
     char sID[8];
     char sName[MAX_NAME_LENGTH];
@@ -136,7 +135,7 @@ public void OnConfigsExecuted()
     do
     {
         Zombie zombie;
-        char sID[8], sName[MAX_NAME_LENGTH], sGravity[16], sSpeed[16], sHealth[16], sModel[PLATFORM_MAX_PATH + 1], sFlags[21];
+        char sID[8], sName[MAX_NAME_LENGTH], sGravity[16], sSpeed[16], sHealth[16], sModel[PLATFORM_MAX_PATH + 1], sFlag[1];
 
         g_kvZombies.GetSectionName(sID, sizeof(sID));
         g_kvZombies.GetString("name", sName, sizeof(sName));
@@ -144,7 +143,7 @@ public void OnConfigsExecuted()
         g_kvZombies.GetString("speed", sSpeed, sizeof(sSpeed));
         g_kvZombies.GetString("health", sHealth, sizeof(sHealth));
         g_kvZombies.GetString("model_path", sModel, sizeof(sModel));
-        g_kvZombies.GetString("flags", sFlags, sizeof(sFlags));
+        g_kvZombies.GetString("flag", sFlag, sizeof(sFlag));
 
         zombie.iID = StringToInt(sID);
         zombie.iHealth = StringToInt(sHealth);
@@ -152,7 +151,7 @@ public void OnConfigsExecuted()
         zombie.fGravity = StringToFloat(sGravity);
         zombie.fSpeed = StringToFloat(sSpeed);
 
-        strcopy(zombie.sFlags, 21, sFlags);
+        strcopy(zombie.sFlag, 1, sFlag);
 
         strcopy(zombie.sID, 8, sID);
         strcopy(zombie.sName, MAX_NAME_LENGTH, sName);
@@ -209,8 +208,16 @@ public void OnClientPutInServer(int client)
 public void OnClientCookiesCached(int client)
 {
     char sBuffer[12];
-    g_coZombie.Get(client, sBuffer, sizeof(sBuffer));
-    g_iZombieClass[client] = StringToInt(sBuffer);
+    if (AreClientCookiesCached(client))
+    {
+        g_coZombie.Get(client, sBuffer, sizeof(sBuffer));
+        g_iZombieClass[client] = StringToInt(sBuffer);
+    }
+    else
+    {
+        g_iZombieClass[client] = 1;
+    }
+    
 }
 
 public Action Command_ZombieClass(int client, int args)
@@ -221,17 +228,18 @@ public Action Command_ZombieClass(int client, int args)
     }
 
     Menu menu = new Menu(MenuHandlers_ZombieClass);
-    menu.SetTitle("EverGames.pl » Wybierz klasę zombie");
+
+    menu.SetTitle("%T", "Zombies: Menu title", client);
 
     Zombie zombie;
 
-    for(int i = 0; i < g_aZombie.Length; i++)
+    for (int i = 0; i < g_aZombie.Length; i++)
     {
         g_aZombie.GetArray(i, zombie, sizeof(zombie));
 
-        g_cZombieFlags.SetString(zombie.sFlags, false, false);
+        int iFlag = ReadFlagString(zombie.sFlag);
 
-        menu.AddItem(zombie.sID, zombie.sName, g_iZombieClass[client] == zombie.iID ? ITEMDRAW_DISABLED : (strlen(zombie.sFlags) > 0 && !BB_CheckCommandAccess(client, "sm_check_zombie_access", g_cZombieFlags, true) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT));
+        menu.AddItem(zombie.sID, zombie.sName, g_iZombieClass[client] == zombie.iID ? ITEMDRAW_DISABLED : (strlen(zombie.sFlag) > 0 && !CheckCommandAccess(client, "bb_check_zombie_access", iFlag, true) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT));
     }
 
     menu.ExitButton = true;
@@ -289,9 +297,9 @@ public Action Event_OnRoundStart(Event event, const char[] name, bool dontBroadc
 
             if (zombie.iID == g_iZombieClass[client])
             {
-                g_cZombieFlags.SetString(zombie.sFlags, false, false);
+                int iFlag = ReadFlagString(zombie.sFlag);
 
-                if (strlen(zombie.sFlags) > 0 && !BB_CheckCommandAccess(client, "sm_check_zombie_access", g_cZombieFlags, true))
+                if (strlen(zombie.sFlag) > 0 && !CheckCommandAccess(client, "bb_check_zombie_access", iFlag, true))
                 {
                     g_coZombie.Set(client, "0");
                     g_iZombieClass[client] = 0;

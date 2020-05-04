@@ -486,4 +486,9 @@
 		"en"		"Now you are playing {1} class!"
 		"pl"		"Aktualnie grasz klasą o nazwie {1}!"
 	}
+	"Zombies: Menu title"
+	{
+		"en"		"BaseBuilder » Choose zombie class"
+		"pl"		"BaseBuilder » Wybierz klasę zombie"
+	}
 }
