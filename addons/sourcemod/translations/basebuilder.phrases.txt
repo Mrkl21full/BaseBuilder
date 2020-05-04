@@ -488,7 +488,7 @@
 	}
 	"Zombies: Menu title"
 	{
-		"en"		"Choose zombie class"
-		"pl"		"Wybierz klasę zombie"
+		"en"		"BaseBuilder » Choose zombie class"
+		"pl"		"BaseBuilder » Wybierz klasę zombie"
 	}
 }
