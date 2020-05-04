@@ -3,10 +3,11 @@
 
 #include <sourcemod>
 #include <sdkhooks>
-#include <EverGames>
+// #include <EverGames>
 #include <clientprefs>
 #include <multicolors>
 #include <basebuilder>
+#include <basebuilder_zombies>
 
 #define PLUGIN_NAME BB_PLUGIN_NAME ... " - Zombie"
 
@@ -37,6 +38,14 @@ enum struct Zombie
     char sModel[PLATFORM_MAX_PATH + 1];
 }
 
+enum struct PlayerData 
+{
+    float fSpeed;
+    float fGravity;
+}
+
+PlayerData g_iPlayer[MAXPLAYERS + 1];
+
 ArrayList g_aZombie = null;
 
 public Plugin myinfo =
@@ -47,6 +56,22 @@ public Plugin myinfo =
     version = BB_PLUGIN_VERSION,
     url = BB_PLUGIN_URL
 };
+
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+    CreateNative("BB_GetClientSpeed", Native_GetClientSpeed);
+    CreateNative("BB_AddClientSpeed", Native_AddClientSpeed);
+    CreateNative("BB_SetClientSpeed", Native_SetClientSpeed);
+
+    CreateNative("BB_GetClientGravity", Native_GetClientGravity);
+    CreateNative("BB_SubClientGravity", Native_SubClientGravity);
+    CreateNative("BB_AddClientGravity", Native_AddClientGravity);
+    CreateNative("BB_SetClientGravity", Native_SetClientGravity);
+
+    RegPluginLibrary("basebuilder_zombies");
+
+    return APLRes_Success;
+}
 
 public void OnPluginStart()
 {
@@ -75,27 +100,34 @@ public void OnConfigsExecuted()
 
     Handle hFile = OpenFile(g_sZombiesFile, "rt");
 
-    if(hFile == null)
+    if (hFile == null)
+    {
         SetFailState("[BB] Can't open File: %s", g_sZombiesFile);
+    }
 
     g_kvZombies = new KeyValues("Zombie-Classes");
 
-    if(!g_kvZombies.ImportFromFile(g_sZombiesFile)) {
+    if (!g_kvZombies.ImportFromFile(g_sZombiesFile))
+    {
         SetFailState("Can't read %s correctly! (ImportFromFile)", g_sZombiesFile);
         delete hFile;
         return;
     }
 
-    if(!g_kvZombies.GotoFirstSubKey()) {
+    if (!g_kvZombies.GotoFirstSubKey())
+    {
         SetFailState("Can't read %s correctly! (GotoFirstSubKey)", g_sZombiesFile);
         delete hFile;
         return;
     }
 
-    if(g_aZombie != null)
+    if (g_aZombie != null)
+    {
         g_aZombie.Clear();
+    }
 
-    do {
+    do
+    {
         Zombie zombie;
         char sID[8], sName[MAX_NAME_LENGTH], sGravity[16], sSpeed[16], sHealth[16], sModel[PLATFORM_MAX_PATH + 1], sVIP[4];
 
@@ -144,12 +176,16 @@ public void OnMapStart()
             PrecacheModel(zombie.sModel);
     }
 
+    CreateTimer(0.1, Timer_SetClientsGravity, _, TIMER_REPEAT);
+
     LoadAndPrecacheAllFiles();
 }
 
 public void OnClientPutInServer(int client)
 {
-	OnClientCookiesCached(client);
+    g_iPlayer[client].fSpeed = 1.0;
+    g_iPlayer[client].fGravity = 1.0;
+    OnClientCookiesCached(client);
 }
 
 public void OnClientCookiesCached(int client)
@@ -161,16 +197,20 @@ public void OnClientCookiesCached(int client)
 
 public Action Command_ZombieClass(int client, int args)
 {
-    if(!BB_IsClientValid(client))
+    if (!BB_IsClientValid(client))
+    {
         return Plugin_Handled;
+    }
 
     Menu menu = new Menu(MenuHandlers_ZombieClass);
     menu.SetTitle("EverGames.pl » Wybierz klasę zombie");
 
     Zombie zombie;
-    int iAccess = EG_GetUserRang(client);
+    //int iAccess = EG_GetUserRang(client);
+    int iAccess = 1;
 
-    for(int i = 0; i < g_aZombie.Length; i++) {
+    for(int i = 0; i < g_aZombie.Length; i++)
+    {
         g_aZombie.GetArray(i, zombie, sizeof(zombie));
 
         menu.AddItem(zombie.sID, zombie.sName, g_iZombieClass[client] == zombie.iID ? ITEMDRAW_DISABLED : (zombie.bVIP && iAccess == 0 ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT));
@@ -183,18 +223,21 @@ public Action Command_ZombieClass(int client, int args)
 
 public int MenuHandlers_ZombieClass(Menu menu, MenuAction action, int client, int item) 
 {
-	if(action == MenuAction_Select) {
+	if (action == MenuAction_Select)
+    {
         char sInfo[32];
         GetMenuItem(menu, item, sInfo, sizeof(sInfo));
 
         g_iZombieClass[client] = StringToInt(sInfo);
 
-        if(GetClientTeam(client) == TEAM_BUILDERS) {
+        if (GetClientTeam(client) == TEAM_BUILDERS)
+        {
             CPrintToChat(client, "%s Klasa zombie została zaktualizowana!", g_sPluginTag);
             return;
         }
 
-        if(BB_GetRoundStatus() == Round_Active) {
+        if (BB_GetRoundStatus() == Round_Active)
+        {
             CPrintToChat(client, "%s Klasa zombie zostanie zmieniona po śmierci!", g_sPluginTag);
             return;
         }
@@ -207,33 +250,43 @@ public Action Event_OnRoundStart(Event event, const char[] name, bool dontBroadc
 {
     int client = GetClientOfUserId(event.GetInt("userid"));
 
-    if(!BB_IsClientValid(client))
+    if (!BB_IsClientValid(client))
+    {
         return Plugin_Handled;
-    
-    if(GetClientTeam(client) == TEAM_BUILDERS) {
+    }
+
+    if(GetClientTeam(client) == TEAM_BUILDERS)
+    {
         BB_SetClientSpeed(client, 1.0);
         BB_SetClientHealth(client, 100);
         BB_SetClientGravity(client, 1.0);
-    } else {
+    }
+    else
+    {
         Zombie zombie;
 
-        for(int i = 0; i < g_aZombie.Length; i++) {
+        for (int i = 0; i < g_aZombie.Length; i++)
+        {
             g_aZombie.GetArray(i, zombie, sizeof(zombie));
 
-            if(zombie.iID == g_iZombieClass[client]) {
-                if(zombie.bVIP && EG_GetUserRang(client) == 0) {
-                    g_coZombie.Set(client, "0");
-                    g_iZombieClass[client] = 0;
-                    CS_RespawnPlayer(client);
-                    break;
-                }
+            if (zombie.iID == g_iZombieClass[client])
+            {
+                // if (zombie.bVIP && EG_GetUserRang(client) == 0)
+                // {
+                //     g_coZombie.Set(client, "0");
+                //     g_iZombieClass[client] = 0;
+                //     CS_RespawnPlayer(client);
+                //     break;
+                // }
 
                 BB_SetClientSpeed(client, zombie.fSpeed);
                 BB_SetClientHealth(client, zombie.iHealth);
                 BB_SetClientGravity(client, zombie.fGravity);
 
-                if(!IsModelPrecached(zombie.sModel))
+                if (!IsModelPrecached(zombie.sModel))
+                {
                     PrecacheModel(zombie.sModel);
+                }
 
                 SetEntityModel(client, zombie.sModel);
 
@@ -250,20 +303,79 @@ stock void LoadAndPrecacheAllFiles()
 {
     Handle hFile = OpenFile(g_sZombiesModels, "rt");
 
-    if(hFile == null) {
+    if (hFile == null)
+    {
         PrintToServer("[BB] Can't open File: %s", g_sZombiesModels);
         return;
     }
 
     char sLine[PLATFORM_MAX_PATH + 1];
     
-    while(!IsEndOfFile(hFile) && ReadFileLine(hFile, sLine, sizeof(sLine))) {
-        if(strncmp(sLine, "//", 2) == 0 || strlen(sLine) < 6)
+    while (!IsEndOfFile(hFile) && ReadFileLine(hFile, sLine, sizeof(sLine)))
+    {
+        if (strncmp(sLine, "//", 2) == 0 || strlen(sLine) < 6)
+        {
             continue;
+        }
 
         TrimString(sLine);            
         AddFileToDownloadsTable(sLine);
     }
 
     delete hFile;
+}
+
+public Action Timer_SetClientsGravity(Handle timer)
+{
+    LoopValidClients(client)
+    {
+        SetEntityGravity(client, g_iPlayer[client].fGravity);
+    }
+}
+
+public int Native_GetClientSpeed(Handle plugin, int numParams)
+{
+    return view_as<int>(g_iPlayer[GetNativeCell(1)].fSpeed);
+}
+
+public int Native_AddClientSpeed(Handle plugin, int numParams)
+{
+    int client = GetNativeCell(1);
+
+    g_iPlayer[client].fSpeed += view_as<float>(GetNativeCell(2));
+
+    SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", g_iPlayer[client].fSpeed);
+
+    return view_as<int>(g_iPlayer[client].fSpeed);
+}
+
+public int Native_SetClientSpeed(Handle plugin, int numParams)
+{
+    int client = GetNativeCell(1);
+
+    g_iPlayer[client].fSpeed = view_as<float>(GetNativeCell(2));
+
+    SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", g_iPlayer[client].fSpeed);
+
+    return view_as<int>(g_iPlayer[client].fSpeed);
+}
+
+public int Native_GetClientGravity(Handle plugin, int numParams)
+{
+    return view_as<int>(g_iPlayer[GetNativeCell(1)].fGravity);
+}
+
+public int Native_AddClientGravity(Handle plugin, int numParams)
+{
+    return view_as<int>(g_iPlayer[GetNativeCell(1)].fGravity += view_as<float>(GetNativeCell(2)));
+}
+
+public int Native_SubClientGravity(Handle plugin, int numParams)
+{
+    return view_as<int>(g_iPlayer[GetNativeCell(1)].fGravity -= view_as<float>(GetNativeCell(2)));
+}
+
+public int Native_SetClientGravity(Handle plugin, int numParams)
+{
+    return view_as<int>(g_iPlayer[GetNativeCell(1)].fGravity = view_as<float>(GetNativeCell(2)));
 }
