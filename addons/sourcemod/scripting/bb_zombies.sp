@@ -229,10 +229,7 @@ public Action Command_ZombieClass(int client, int args)
 
     Menu menu = new Menu(MenuHandlers_ZombieClass);
 
-    char sMenuTitle[32];
-    Format(sMenuTitle, sizeof(sMenuTitle), "%T", "Zombies: Menu title", client);
-
-    menu.SetTitle(sMenuTitle);
+    menu.SetTitle("%T", "Zombies: Menu title", client);
 
     Zombie zombie;
 
