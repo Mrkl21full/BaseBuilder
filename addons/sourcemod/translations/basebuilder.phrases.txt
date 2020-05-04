@@ -403,7 +403,7 @@
 
 	"Shop: Item global limit"
 	{
-		"#format"	"{1:s}.{2:d}"
+		"#format"	"{1:s},{2:d}"
 		"en"		"Item {green}{1}{default} has been bought by someone else! {2} global usages!"
 		"pl"		"Item {green}{1}{default} został kupiony przez kogoś innego! {2} globalnych użyć!"
 	}
