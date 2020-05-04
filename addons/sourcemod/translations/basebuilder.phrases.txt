@@ -465,6 +465,25 @@
 	{
 		"#format"	"{1:s},{2:d}"
 		"en"		"Health Points: <font color='{1}'>{2} HP</font>"
-		"en"		"Punktów życia: <font color='{1}'>{2} HP</font>"
+		"pl"		"Punktów życia: <font color='{1}'>{2} HP</font>"
+	}
+
+	"Zombies: Class updated"
+	{
+		"en"		"Class has been updated!"
+		"pl"		"Klasa została zaktualizowana!"
+	}
+
+	"Zombies: Class change after death"
+	{
+		"en"		"Class will be changed after death!"
+		"pl"		"Klasa zostanie zmieniona po śmierci!"
+	}
+
+	"Zombies: Current class"
+	{
+		"#format"	"{1:s}"
+		"en"		"Now you are playing {1} class!"
+		"pl"		"Aktualnie grasz klasą o nazwie {1}!"
 	}
 }
