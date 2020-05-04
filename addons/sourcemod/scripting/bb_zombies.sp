@@ -247,13 +247,13 @@ public int MenuHandlers_ZombieClass(Menu menu, MenuAction action, int client, in
 
         if (GetClientTeam(client) == TEAM_BUILDERS)
         {
-            CPrintToChat(client, "%s Klasa zombie została zaktualizowana!", g_sPluginTag);
+            CPrintToChat(client, "%s %T", g_sPluginTag, "Zombies: Class updated", client);
             return;
         }
 
         if (BB_GetRoundStatus() == Round_Active)
         {
-            CPrintToChat(client, "%s Klasa zombie zostanie zmieniona po śmierci!", g_sPluginTag);
+            CPrintToChat(client, "%s %T", g_sPluginTag, "Zombies: Class change after death", client);
             return;
         }
 
@@ -305,7 +305,7 @@ public Action Event_OnRoundStart(Event event, const char[] name, bool dontBroadc
 
                 SetEntityModel(client, zombie.sModel);
 
-                CPrintToChat(client, "%s Aktualnie grasz klasą o nazwie \x07%s\x01!", g_sPluginTag, zombie.sName);
+                CPrintToChat(client, "%s %T", g_sPluginTag, "Zombies: current class", client, zombie.sName);
                 break;
             }
         }
