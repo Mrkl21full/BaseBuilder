@@ -161,8 +161,8 @@ void Call_OnSQLConnect()
 
 void CheckAndCreateTables()
 {
-    BB_Query("SQL_CreateMainBaseBuilderTable", "CREATE TABLE IF NOT EXISTS `bb` ( `ID` INT NOT NULL AUTO_INCREMENT , `CommunityID` VARCHAR(64) NOT NULL , `Color` INT NOT NULL DEFAULT 0, `Points` INT NOT NULL DEFAULT 0, `Level` INT NOT NULL DEFAULT 1, PRIMARY KEY (`ID`), UNIQUE (`CommunityID`)) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;");
-    BB_Query("SQL_CreateBaseBuilderRoundTable", "CREATE TABLE IF NOT EXISTS `bb_rounds` ( `ID` INT NOT NULL AUTO_INCREMENT , `Start` INT NOT NULL DEFAULT 0 , `End` INT NOT NULL DEFAULT 0, PRIMARY KEY (`id`)) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;");
+    BB_Query("SQL_CreateMainBaseBuilderTable", "CREATE TABLE IF NOT EXISTS `bb` ( `ID` INT NOT NULL AUTO_INCREMENT, `CommunityID` VARCHAR(64) NOT NULL, `Rotate` FLOAT(4,1) NOT NULL DEFAULT 45.0, `Color` INT NOT NULL DEFAULT 0, `Points` INT NOT NULL DEFAULT 0, `Level` INT NOT NULL DEFAULT 1, PRIMARY KEY (`ID`), UNIQUE (`CommunityID`)) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;");
+    BB_Query("SQL_CreateBaseBuilderRoundTable", "CREATE TABLE IF NOT EXISTS `bb_rounds` ( `ID` INT NOT NULL AUTO_INCREMENT, `Start` INT NOT NULL DEFAULT 0, `End` INT NOT NULL DEFAULT 0, PRIMARY KEY (`id`)) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;");
 
     SetCharsetAndCollate();
 }

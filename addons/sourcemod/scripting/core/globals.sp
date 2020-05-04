@@ -70,6 +70,7 @@ bool g_bIsBuildTime = false;
 bool g_bIsPrepTime = false;
 
 ConVar g_cPluginTag = null;
+ConVar g_cLoadConvars = null;
 ConVar g_cWarmupTime = null;
 ConVar g_cPrepTime = null;
 ConVar g_cBuildTime = null;
@@ -81,6 +82,9 @@ ConVar g_cScrambleTeams = null;
 ConVar g_cRemoveNotUsedBlocks = null;
 ConVar g_cRemoveBlockAfterDeath = null;
 ConVar g_cPushPlayersOfBlocks = null;
+ConVar g_cMoveBlocks = null;
+ConVar g_cLockBlocks = null;
+ConVar g_cBlockRotation = null;
 
 RoundStatus g_iStatus = Round_Inactive;
 
@@ -99,6 +103,7 @@ enum struct PlayerData
     int iIcon;
 
     float fSpeed;
+    float fRotate;
     float fGravity;
     float fPlayerSelectedBlockDistance;
 
