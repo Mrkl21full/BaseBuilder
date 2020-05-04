@@ -229,7 +229,9 @@ public Action Command_ZombieClass(int client, int args)
     {
         g_aZombie.GetArray(i, zombie, sizeof(zombie));
 
-        menu.AddItem(zombie.sID, zombie.sName, g_iZombieClass[client] == zombie.iID ? ITEMDRAW_DISABLED : (strlen(zombie.sFlags) > 0 && !HasPlayerFlags(client, zombie.sFlags) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT));
+        g_cZombieFlags.SetString(zombie.sFlags, false, false);
+
+        menu.AddItem(zombie.sID, zombie.sName, g_iZombieClass[client] == zombie.iID ? ITEMDRAW_DISABLED : (strlen(zombie.sFlags) > 0 && !BB_CheckCommandAccess(client, "sm_check_zombie_access", g_cZombieFlags, true) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT));
     }
 
     menu.ExitButton = true;
