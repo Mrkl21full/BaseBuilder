@@ -18,6 +18,9 @@ KeyValues g_kvZombies;
 ConVar g_cPluginTag = null;
 char g_sPluginTag[64];
 
+ConVar g_cGravityTimerInterval;
+Handle g_hGravityTimer;
+
 char g_sZombiesFile[PLATFORM_MAX_PATH + 1];
 
 int g_iZombieClass[MAXPLAYERS + 1] = { 0, ... };
@@ -75,6 +78,13 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 public void OnPluginStart()
 {
     BB_IsGameCSGO();
+    BB_LoadTranslations();
+
+    BB_StartConfig("zombies");
+    CreateConVar("bb_zombies_version", BB_PLUGIN_VERSION, BB_PLUGIN_DESCRIPTION, FCVAR_NOTIFY | FCVAR_DONTRECORD | FCVAR_REPLICATED);
+    g_cGravityTimerInterval = AutoExecConfig_CreateConVar("bb_gravity_timer_intervar", "0.1", "Set interval for timer setting up clients gravity.", _, true, 0.1, true, 10.0);
+    g_cGravityTimerInterval.AddChangeHook(OnConVarChanged);
+    BB_EndConfig();
 
     g_aZombie = new ArrayList(sizeof(Zombie));
 
@@ -88,6 +98,8 @@ public void OnPluginStart()
     g_coZombie = new Cookie("bb_zombie_class", "Player Zombie Class", CookieAccess_Private);
 
     BuildPath(Path_SM, g_sZombiesFile, sizeof(g_sZombiesFile), "configs/basebuilder/zombie_classes.ini");
+
+    g_hGravityTimer = CreateTimer(g_cGravityTimerInterval.FloatValue, Timer_SetClientsGravity, _, TIMER_REPEAT);
 }
 
 public void OnConfigsExecuted()
@@ -150,15 +162,22 @@ public void OnConfigsExecuted()
         strcopy(zombie.sModel, PLATFORM_MAX_PATH + 1, sModel);
 
         g_aZombie.PushArray(zombie, sizeof(zombie));
-    } while(g_kvZombies.GotoNextKey());
+    } while (g_kvZombies.GotoNextKey());
 
     delete hFile;
 }
 
 public void OnConVarChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-    if(convar == g_cPluginTag)
+    if (convar == g_cPluginTag)
+    {
         g_cPluginTag.GetString(g_sPluginTag, sizeof(g_sPluginTag));
+    }
+    else if (convar == g_cGravityTimerInterval)
+    {
+        delete g_hGravityTimer;
+        g_hGravityTimer = CreateTimer(g_cGravityTimerInterval.FloatValue, Timer_SetClientsGravity, _, TIMER_REPEAT);
+    }
 }
 
 public void OnMapStart()
@@ -167,14 +186,16 @@ public void OnMapStart()
 
     Zombie zombie;
 
-    for(int i = 0; i < g_aZombie.Length; i++) {
+    for (int i = 0; i < g_aZombie.Length; i++)
+    {
         g_aZombie.GetArray(i, zombie, sizeof(zombie));
 
-        if(strlen(zombie.sModel) > 0)
+        if (strlen(zombie.sModel) > 0)
+        {
             PrecacheModel(zombie.sModel);
+        }
+            
     }
-
-    CreateTimer(0.1, Timer_SetClientsGravity, _, TIMER_REPEAT);
 }
 
 public void OnClientPutInServer(int client)
