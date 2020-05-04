@@ -19,7 +19,6 @@ ConVar g_cPluginTag = null;
 char g_sPluginTag[64];
 
 char g_sZombiesFile[PLATFORM_MAX_PATH + 1];
-char g_sZombiesModels[PLATFORM_MAX_PATH + 1];
 
 int g_iZombieClass[MAXPLAYERS + 1] = { 0, ... };
 
@@ -89,7 +88,6 @@ public void OnPluginStart()
     g_coZombie = new Cookie("bb_zombie_class", "Player Zombie Class", CookieAccess_Private);
 
     BuildPath(Path_SM, g_sZombiesFile, sizeof(g_sZombiesFile), "configs/basebuilder/zombie_classes.ini");
-    BuildPath(Path_SM, g_sZombiesModels, sizeof(g_sZombiesModels), "configs/basebuilder/zombie_models.ini");
 }
 
 public void OnConfigsExecuted()
@@ -177,8 +175,6 @@ public void OnMapStart()
     }
 
     CreateTimer(0.1, Timer_SetClientsGravity, _, TIMER_REPEAT);
-
-    LoadAndPrecacheAllFiles();
 }
 
 public void OnClientPutInServer(int client)
@@ -295,32 +291,6 @@ public Action Event_OnRoundStart(Event event, const char[] name, bool dontBroadc
     }
 
     return Plugin_Handled;
-}
-
-stock void LoadAndPrecacheAllFiles()
-{
-    Handle hFile = OpenFile(g_sZombiesModels, "rt");
-
-    if (hFile == null)
-    {
-        PrintToServer("[BB] Can't open File: %s", g_sZombiesModels);
-        return;
-    }
-
-    char sLine[PLATFORM_MAX_PATH + 1];
-    
-    while (!IsEndOfFile(hFile) && ReadFileLine(hFile, sLine, sizeof(sLine)))
-    {
-        if (strncmp(sLine, "//", 2) == 0 || strlen(sLine) < 6)
-        {
-            continue;
-        }
-
-        TrimString(sLine);            
-        AddFileToDownloadsTable(sLine);
-    }
-
-    delete hFile;
 }
 
 public Action Timer_SetClientsGravity(Handle timer)
