@@ -31,7 +31,7 @@ enum struct Zombie
     float fGravity;
     float fSpeed;
 
-    bool bVIP;
+    char sFlags[21];
 
     char sID[8];
     char sName[MAX_NAME_LENGTH];
@@ -129,7 +129,7 @@ public void OnConfigsExecuted()
     do
     {
         Zombie zombie;
-        char sID[8], sName[MAX_NAME_LENGTH], sGravity[16], sSpeed[16], sHealth[16], sModel[PLATFORM_MAX_PATH + 1], sVIP[4];
+        char sID[8], sName[MAX_NAME_LENGTH], sGravity[16], sSpeed[16], sHealth[16], sModel[PLATFORM_MAX_PATH + 1], sFlags[21];
 
         g_kvZombies.GetSectionName(sID, sizeof(sID));
         g_kvZombies.GetString("name", sName, sizeof(sName));
@@ -137,7 +137,7 @@ public void OnConfigsExecuted()
         g_kvZombies.GetString("speed", sSpeed, sizeof(sSpeed));
         g_kvZombies.GetString("health", sHealth, sizeof(sHealth));
         g_kvZombies.GetString("model_path", sModel, sizeof(sModel));
-        g_kvZombies.GetString("vip_access", sVIP, sizeof(sVIP));
+        g_kvZombies.GetString("flags", sFlags, sizeof(sFlags));
 
         zombie.iID = StringToInt(sID);
         zombie.iHealth = StringToInt(sHealth);
@@ -145,7 +145,7 @@ public void OnConfigsExecuted()
         zombie.fGravity = StringToFloat(sGravity);
         zombie.fSpeed = StringToFloat(sSpeed);
 
-        zombie.bVIP = StrEqual(sVIP, "1");
+        strcopy(zombie.sFlags, 21, sFlags);
 
         strcopy(zombie.sID, 8, sID);
         strcopy(zombie.sName, MAX_NAME_LENGTH, sName);
@@ -206,14 +206,12 @@ public Action Command_ZombieClass(int client, int args)
     menu.SetTitle("EverGames.pl » Wybierz klasę zombie");
 
     Zombie zombie;
-    //int iAccess = EG_GetUserRang(client);
-    int iAccess = 1;
 
     for(int i = 0; i < g_aZombie.Length; i++)
     {
         g_aZombie.GetArray(i, zombie, sizeof(zombie));
 
-        menu.AddItem(zombie.sID, zombie.sName, g_iZombieClass[client] == zombie.iID ? ITEMDRAW_DISABLED : (zombie.bVIP && iAccess == 0 ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT));
+        menu.AddItem(zombie.sID, zombie.sName, g_iZombieClass[client] == zombie.iID ? ITEMDRAW_DISABLED : (strlen(zombie.sFlags) > 0 && !HasPlayerFlags(client, zombie.sFlags) ? ITEMDRAW_DISABLED : ITEMDRAW_DEFAULT));
     }
 
     menu.ExitButton = true;
@@ -378,4 +376,158 @@ public int Native_SubClientGravity(Handle plugin, int numParams)
 public int Native_SetClientGravity(Handle plugin, int numParams)
 {
     return view_as<int>(g_iPlayer[GetNativeCell(1)].fGravity = view_as<float>(GetNativeCell(2)));
+}
+
+public bool HasPlayerFlags(int client, char flags[21])
+{
+	
+	if (StrContains(flags, "a") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_RESERVATION))
+		{
+			return true;
+		}
+	}		
+	else if (StrContains(flags, "b") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_GENERIC))
+		{
+			return true;
+		}
+	}
+	else if (StrContains(flags, "c") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_KICK))
+		{
+			return true;
+		}
+	}
+	else if (StrContains(flags, "d") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_BAN))
+		{
+			return true;
+		}
+	}
+	else if (StrContains(flags, "e") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_UNBAN))
+		{
+			return true;
+		}
+	}	
+	else if (StrContains(flags, "f") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_SLAY))
+		{
+			return true;
+		}
+	}	
+	else if (StrContains(flags, "g") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_CHANGEMAP))
+		{
+			return true;
+		}
+	}
+	else if (StrContains(flags, "h") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", 128))
+		{
+			return true;
+		}
+	}		
+	else if (StrContains(flags, "i") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_CONFIG))
+		{
+			return true;
+		}
+	}
+	else if (StrContains(flags, "j") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_CHAT))
+		{
+			return true;
+		}
+	}		
+	else if (StrContains(flags, "k") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_VOTE))
+		{
+			return true;
+		}
+	}	
+	else if (StrContains(flags, "l") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_PASSWORD))
+		{
+			return true;
+		}
+	}
+	else if (StrContains(flags, "m") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_RCON))
+		{
+			return true;
+		}
+	}		
+	else if (StrContains(flags, "n") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_CHEATS))
+		{
+			return true;
+		}
+	}		
+	else if (StrContains(flags, "z") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_ROOT))
+		{
+			return true;
+		}
+	}		
+	else if (StrContains(flags, "o") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_CUSTOM1))
+		{
+			return true;
+		}
+	}		
+	else if (StrContains(flags, "p") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_CUSTOM2))
+		{
+			return true;
+		}
+	}
+	else if (StrContains(flags, "q") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_CUSTOM3))
+		{
+			return true;
+		}
+	}		
+	else if (StrContains(flags, "r") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_CUSTOM4))
+		{
+			return true;
+		}
+	}			
+	else if (StrContains(flags, "s") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_CUSTOM5))
+		{
+			return true;
+		}
+	}			
+	else if (StrContains(flags, "t") != -1)
+	{
+		if (CheckCommandAccess(client, "bb_use_zombie_class", ADMFLAG_CUSTOM6))
+		{
+			return true;
+		}
+	}
+	
+	return false;
 }
