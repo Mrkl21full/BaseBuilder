@@ -1,5 +1,42 @@
 "Phrases"
 {
+	"Main: Hud footer"
+	{
+		"en"		"BaseBuilder"
+	}
+
+	"Main: Seconds"
+	{
+		"#format"	"{1:d}"
+		"en"		"» {1} seconds"
+		"pl"		"» {1} sekund"
+	}
+
+	"Main: Build time"
+	{
+		"en"		"Build time will end in:"
+		"pl"		"Budowanie zakończy się za:"
+	}
+
+	"Main: Preparation time"
+	{
+		"en"		"Zombies will be released in:"
+		"pl"		"Zombie zostaną wypuszczone za:"
+	}
+
+	"Main: Start"
+	{
+		"en"		"Start - GO!!!"
+		"pl"		"Start - GO!!!"
+	}
+
+	"Main: Round begun"
+	{
+		"#format"	"{1:d}"
+		"en"		"Round #{1} just begun!"
+		"pl"		"Runda #{1} została rozpoczęta!"
+	}
+
 	"Main: Suicide disabled"
 	{
 		"en"		"Suicides are disabled!"
@@ -15,7 +52,7 @@
 	"Main: Current points"
 	{
 		"#format"	"{1:d}"
-		"en"		"You have {green}{1} points{default}!"
+		"en"		"You now have {green}{1} points{default}!"
 		"pl"		"Aktualnie masz {green}{1} punktów{default}!"
 	}
 
@@ -91,30 +128,131 @@
 		"pl"		"Twój kolega z party wyszedł z serwera!"
 	}
 
-	"Spectate: Command only for zombies"
-	{
-		"en"		"Only zombies can use this command!"
-		"pl"		"Tylko zombie mogą używać tej komendy!"
-	}
-
-	"Spectate: Command can be use in building phase"
-	{
-		"en"		"This command can be used only in building phase!"
-		"pl"		"Ta komenda może być używana tylko podczas fazy budowania!"
-	}
-
-	"PlayerHUD: Current LVL"
+	"Shop: Title"
 	{
 		"#format"	"{1:d}"
-		"en"		"Current level: <font color='#11FF00'>{1} level</font>"
-		"pl"		"Aktualny poziom: <font color='#11FF00'>{1} level</font>"
+		"en"		"BaseBuilder shop\nYour have {1} credits"
+		"pl"		"Sklep BaseBuilder\nMasz {1} kredytów"
 	}
 
-	"PlayerHUD: Health points"
+	"Shop: Reopen enabled"
+	{
+		"en"		"Shop re-open has been enabled!"
+		"pl"		"Otwieranie sklepu zostało właczone!"
+	}
+
+	"Shop: Reopen disabled"
+	{
+		"en"		"Shop re-open has been disabled!"
+		"pl"		"Otwieranie sklepu zostało wyłączone!"
+	}
+
+	"Shop: Not alive"
+	{
+		"en"		"You must be alive to buy something!"
+		"pl"		"Musisz żyć, aby kupić cokolwiek!"
+	}
+
+	"Shop: Buy in active round"
+	{
+		"en"		"You can buy only in active round!"
+		"pl"		"Kupować można tylko podczas aktywnej rundy!"
+	}
+
+	"Shop: Not spectator"
+	{
+		"en"		"You must be in playable team to use shop!"
+		"pl"		"Aby używać sklepu musisz być grającym!"
+	}
+
+	"Shop: Current credits"
+	{
+		"#format"	"{1:d}"
+		"en"		"You have {green}{1} credits{default}!"
+		"pl"		"Aktualnie masz {green}{1} kredytów{default}!"
+	}
+
+	"Shop: Current credits hud"
+	{
+		"#format"	"{1:d}"
+		"en"		"You have {1} credits!"
+		"pl"		"Aktualnie masz {1} kredytów!"
+	}
+
+	"Shop: Credits earned"
+	{
+		"#format"	"{1:d}"
+		"en"		"You earned {green}+{1} credits{default}!"
+		"pl"		"Otrzymałeś {green}+{1} kredytów{default}!"
+	}
+
+	"Shop: Credits earned hud"
+	{
+		"#format"	"{1:d}"
+		"en"		"You earned +{1} credits!"
+		"pl"		"Otrzymałeś +{1} kredytów!"
+	}
+
+	"Shop: Credits lost"
+	{
+		"#format"	"{1:d}"
+		"en"		"You lost {green}-{1} credits{default}!"
+		"pl"		"Straciłeś {green}-{1} kredytów{default}!"
+	}
+
+	"Shop: Credits lost hud"
+	{
+		"#format"	"{1:d}"
+		"en"		"You los -{1} credits!"
+		"pl"		"Straciłeś -{1} kredytów!"
+	}
+
+	"Shop: Bought item"
 	{
 		"#format"	"{1:s},{2:d}"
-		"en"		"Health Points: <font color='{1}'>{2} HP</font>"
-		"en"		"Punktów życia: <font color='{1}'>{2} HP</font>"
+		"en"		"You just bought {green}{1}{default} for {green}{2} credits{default}!"
+		"pl"		"Właśnie kupiłeś {green}{1}{default} za {green}{2} kredytów{default}!"
+	}
+
+	"Shop: Item disabled"
+	{
+		"#format"	"{1:s}"
+		"en"		"Item {green}{1}{default} is disabled!"
+		"pl"		"Item {green}{1}{default} jest wyłączony!"
+	}
+
+	"Shop: Item global limit"
+	{
+		"#format"	"{1:s}.{2:d}"
+		"en"		"Item {green}{1}{default} has been bought by someone else! {2} global usages!"
+		"pl"		"Item {green}{1}{default} został kupiony przez kogoś innego! {2} globalnych użyć!"
+	}
+
+	"Shop: Item max limit"
+	{
+		"#format"	"{1:s},{2:d}"
+		"en"		"You already bought {green}{1} {2} times{default}!"
+		"pl"		"Już kupiłeś {green}{1} {2} razy{default}!"
+	}
+
+	"Shop: Not enough credits"
+	{
+		"en"		"You don't have enough credits!"
+		"pl"		"Nie masz wystarczajaco dużo kredytów!"
+	}
+
+	"Shop: Set credits"
+	{
+		"#format"	"{1:N},{2:d}"
+		"en"		"{lime}{1}{default} now have {green}{2} credits{default}!"
+		"pl"		"{lime}{1}{default} ma teraz {green}{2} kredytów{default}!"
+	}
+
+	"Shop: Item not found"
+	{
+		"#format"	"{1:s}"
+		"en"		"Item '{1}' has found!"
+		"pl"		"Nie znaleziono '{1}'!"
 	}
 
 	"Spectate: Command only for zombies"
