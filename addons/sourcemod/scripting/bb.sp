@@ -920,6 +920,8 @@ public int PlayerColors_Change(Menu menu, MenuAction action, int client, int ite
 		{
 			ColorBlockByClient(client);
 		}
+
+		Command_Colors(client, 0);
 	}
 }
 
@@ -963,7 +965,7 @@ public Action Command_Party(int client, int args)
 	if (strlen(sUID) <= 0)
 	{
 		Format(sNick, sizeof(sNick), "%T", "Party: Empty list", client);
-		menu.AddItem("empty", sNick);
+		menu.AddItem("empty", sNick, ITEMDRAW_DISABLED);
 	}
 
 	menu.Display(client, MENU_TIME_FOREVER);
