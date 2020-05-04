@@ -18,6 +18,7 @@ ConVar g_cZombieHideDistance;
 ConVar g_cHidePartyTeammatesWhileCloseToEachOthers;
 ConVar g_cPartyTeammateHideDistance;
 ConVar g_cHideZombieWhileSpectating;
+
 ConVar g_cPluginTag;
 char g_sPluginTag[64];
 
