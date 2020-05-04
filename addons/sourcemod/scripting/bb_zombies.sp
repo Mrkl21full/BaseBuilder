@@ -3,7 +3,6 @@
 
 #include <sourcemod>
 #include <sdkhooks>
-// #include <EverGames>
 #include <clientprefs>
 #include <multicolors>
 #include <basebuilder>
@@ -286,13 +285,13 @@ public Action Event_OnRoundStart(Event event, const char[] name, bool dontBroadc
 
             if (zombie.iID == g_iZombieClass[client])
             {
-                // if (zombie.bVIP && EG_GetUserRang(client) == 0)
-                // {
-                //     g_coZombie.Set(client, "0");
-                //     g_iZombieClass[client] = 0;
-                //     CS_RespawnPlayer(client);
-                //     break;
-                // }
+                if (strlen(zombie.sFlags) > 0 && !HasPlayerFlags(client, zombie.sFlags))
+                {
+                    g_coZombie.Set(client, "0");
+                    g_iZombieClass[client] = 0;
+                    CS_RespawnPlayer(client);
+                    break;
+                }
 
                 BB_SetClientSpeed(client, zombie.fSpeed);
                 BB_SetClientHealth(client, zombie.iHealth);

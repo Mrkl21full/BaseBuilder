@@ -7,6 +7,8 @@
  * Get client speed.
  *
  * @param client            Client index.
+ *
+ * @return                  Client speed.
  */
 native float BB_GetClientSpeed(int client);
 
@@ -15,6 +17,8 @@ native float BB_GetClientSpeed(int client);
  *
  * @param client            Client index.
  * @param speed             Speed to add.
+ *
+ * @return                  Client speed.
  */
 native float BB_AddClientSpeed(int client, float speed = 0.1);
 
@@ -23,6 +27,8 @@ native float BB_AddClientSpeed(int client, float speed = 0.1);
  *
  * @param client            Client index.
  * @param speed             Speed.
+ *
+ * @return                  Client speed.
  */
 native float BB_SetClientSpeed(int client, float speed = 1.0);
 
@@ -30,6 +36,8 @@ native float BB_SetClientSpeed(int client, float speed = 1.0);
  * Get client gravity.
  *
  * @param client            Client index.
+ *
+ * @return                  Client gravity.
  */
 native float BB_GetClientGravity(int client);
 
@@ -38,6 +46,8 @@ native float BB_GetClientGravity(int client);
  *
  * @param client            Client index.
  * @param gravity           gravity to add.
+ *
+ * @return                  Client gravity.
  */
 native float BB_AddClientGravity(int client, float gravity = 0.1);
 
@@ -46,6 +56,8 @@ native float BB_AddClientGravity(int client, float gravity = 0.1);
  *
  * @param client            Client index.
  * @param gravity           gravity to substract.
+ *
+ * @return                  Client gravity.
  */
 native float BB_SubClientGravity(int client, float gravity = 0.1);
 
@@ -54,5 +66,7 @@ native float BB_SubClientGravity(int client, float gravity = 0.1);
  *
  * @param client            Client index.
  * @param gravity           gravity.
+ *
+ * @return                  Client gravity.
  */
 native float BB_SetClientGravity(int client, float gravity = 1.0);
